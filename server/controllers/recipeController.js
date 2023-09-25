@@ -34,6 +34,19 @@ const recipeController = {
     }
   },
 
+  // Function to create a prompt and return based on the user input
+  getPrompt: async (userIngredients, prepTime) => {
+    try {
+      const prompt = `Generate a cooking recipe that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
+      The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary and include the time each step should take.`;
+  
+      return prompt;
+    } catch (error) { 
+      throw error;
+    }
+  },
+
 };
 
 module.exports = recipeController;
+
