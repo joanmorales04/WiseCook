@@ -5,6 +5,7 @@ function App() {
   const [prepTime, setPrepTime] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [submitted, setSubmitted] = useState(false);
+  const [recipe, setRecipe] = useState(null); // Define recipe state variable
 
   const handleIngredientChange = (event, index) => {
     const newIngredients = [...ingredients];
@@ -22,24 +23,23 @@ function App() {
     };
     
     try {
-      // Making a POST request to '/recipe' endpoint
-      const response = await fetch('/recipe', {
+      // Making a POST request to the updated '/recipe' endpoint
+      const response = await fetch('/recipe', { // Updated the URL to '/recipe'
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(payload), // Converting the payload to a JSON string
+        body: JSON.stringify(payload),
       });
       
       if (response.ok) {
-        // If the response is OK, set the submitted state to true
+        const receivedRecipe = await response.json(); 
+        setRecipe(receivedRecipe);
         setSubmitted(true);
       } else {
-        // Handle errors (e.g. display an error message)
         console.error('Failed to submit form:', await response.text());
       }
     } catch (error) {
-      // Handle exceptions (e.g. network errors)
       console.error('An error occurred while submitting the form:', error);
     }
   }
@@ -76,7 +76,13 @@ function App() {
         <button type="submit">Submit</button>
       </form>
       
-      {submitted && <p>Thank you for the submission</p>}
+      {submitted && recipe && (
+        <div className="recipe-container">
+          <h2>Generated Recipe:</h2>
+          <p>{recipe.name}</p>
+          {/* Render other parts of the recipe as needed */}
+        </div>
+      )}
     </div>
   );
 }
