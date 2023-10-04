@@ -1,28 +1,48 @@
+@import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap');
+
+body {
+  background-color: #F5F5DC; /* Subtle olive green */
+}
+
 .app-container {
     max-width: 600px;
     margin: auto;
     text-align: center;
-    background-color: #f4f4f4;
+    background-color: #FFFAF0; /* FloralWhite - Like an old recipe card */
     padding: 20px;
-  }
-  
-  form {
+    border: 1px solid #E6E6FA; /* Lavender */
+    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+}
+
+h1 {
+    font-family: 'Dancing Script', cursive; /* A handwritten-like font for headings. Remember to import it from Google Fonts */
+    color: #8B4513; /* SaddleBrown - Darker text for contrast */
+}
+
+form {
     margin-top: 20px;
-  }
-  
-  select,
-  input,
-  button {
+}
+
+select, input {
     margin: 10px;
     padding: 10px;
     display: block;
     width: 80%;
     margin-left: auto;
     margin-right: auto;
-  }
-  
-  button {
+    border: 1px solid #A0522D; /* Sienna - Earthy border color */
+    border-radius: 5px; /* Rounded edges */
+}
+
+button {
     cursor: pointer;
-    background-color: blue;
+    background-color: #D2691E; /* Chocolate - Earthy button color */
     color: white;
-  }
+    border: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+button:hover {
+    background-color: #8B4513; /* SaddleBrown - Darken button color on hover */
+}
