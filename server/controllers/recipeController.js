@@ -5,17 +5,14 @@ const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"]
 });
 
-// Define a function to generate text
+// function to generate api response
 const generateText = async (prompt) => {
-  const response = await openai.createCompletion({
+  const chatCompletion = await openai.chat.completions.create({
+    messages: [{ role: 'user', content: prompt }],
     model: 'gpt-3.5-turbo',
-    prompt: prompt,
-    temperature: 0,
-    max_tokens: 800, // Specify the maximum number of tokens to generate
   });
 
-  // Return the generated text from the response
-  return response.choices[0].text;
+  return chatCompletion.choices[0].message.content;
 }
 
 // handle all functions for recipeRoutes here
@@ -30,6 +27,19 @@ const recipeController = {
       // Return the generated recipe
       return generatedRecipe;
     } catch (error) {
+      throw error;
+    }
+  },
+
+  // Function to create a prompt and return based on the user input
+  generatePrompt: async (prepTime, userIngredients) => {
+    try {
+      const prompt = `Generate a cooking recipe that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
+      The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary.
+      Limit the response to no more than 500 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array. `;
+
+      return prompt;
+    } catch (error) { 
       throw error;
     }
   },
