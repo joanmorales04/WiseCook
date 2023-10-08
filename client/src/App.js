@@ -1,11 +1,21 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import jwt_decode from 'jwt-decode';
+import Login from './pages/Login'; // Adjust the path to the Login component
 import './App.css';
 
 function App() {
   const [prepTime, setPrepTime] = useState('');
   const [ingredients, setIngredients] = useState([]);
   const [submitted, setSubmitted] = useState(false);
-  const [recipe, setRecipe] = useState(''); // Define recipe state variable
+  
+  const [title, setTitle] = useState();
+  const [generatedTime, setGeneratedTime] = useState();
+  const [cookTime, setCookTime] = useState();
+  const [sevings, setServings] = useState();
+  const [generatedIngredients, setGeneratedIngredients] = useState([]);
+  const [instructions, setInstructions] = useState([]);
+
+  const [user, setUser] = useState({});
 
   const handleIngredientChange = (event, index) => {
     const newIngredients = [...ingredients];
@@ -34,7 +44,18 @@ function App() {
       
       if (response.ok) {
         const receivedRecipe = await response.json();
-        setRecipe(receivedRecipe.recipe);
+
+        const recipeObject = JSON.parse(receivedRecipe.recipe);
+
+        console.log(recipeObject);
+
+        setTitle(recipeObject.title);
+        setGeneratedTime(recipeObject.prep_time);
+        setCookTime(recipeObject.cook_time);
+        setServings(recipeObject.servings);
+        setGeneratedIngredients(recipeObject.ingredients);
+        setInstructions(recipeObject.instructions);
+
         setSubmitted(true);
       } else {
         console.error('Failed to submit form:', await response.text());
@@ -45,45 +66,77 @@ function App() {
   }
 
   return (
-    <div className="app-container">
-      <h1>WiseCook</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Select Prep Time:
-          <select value={prepTime} onChange={(e) => setPrepTime(e.target.value)}>
-            <option value="">Select</option>
-            <option value="15">15 mins</option>
-            <option value="30">30 mins</option>
-            <option value="60">1 hr</option>
-            <option value="over">over 1 hr</option>
-          </select>
-        </label>
-        
-        {ingredients.map((ingredient, index) => (
-          <input
-            key={index}
-            type="text"
-            placeholder="Enter ingredient"
-            value={ingredient}
-            onChange={(e) => handleIngredientChange(e, index)}
-          />
-        ))}
-        
-        <button type="button" onClick={() => setIngredients([...ingredients, ''])}>
-          Add Ingredient
-        </button>
-        
-        <button type="submit">Submit</button>
-      </form>
-      
-      {submitted && recipe && (
-        <div className="recipe-container">
-          <h2>Generated Recipe:</h2>
-          <p>{recipe}</p>
-          {/* Render other parts of the recipe as needed */}
-        </div>
-      )}
+  	<div className="App"> 
+      {user && <Login user={user} setUser={setUser} />}
+	   {Object.keys(user).length !== 0 &&
+    
+    	<div className="app-container">
+      	<h1>WiseCook</h1>
+	      	<div>
+		      <form onSubmit={handleSubmit}>
+		        <label>
+		          Select Prep Time:
+		          <select value={prepTime} onChange={(e) => setPrepTime(e.target.value)}>
+		            <option value="">Select</option>
+		            <option value="15">15 mins</option>
+		            <option value="30">30 mins</option>
+		            <option value="60">1 hr</option>
+		            <option value="over">over 1 hr</option>
+		          </select>
+		        </label>
+		        {ingredients.map((ingredient, index) => (
+		          <input
+		            key={index}
+		            type="text"
+		            placeholder="Enter ingredient"
+		            value={ingredient}
+		            onChange={(e) => handleIngredientChange(e, index)}
+		          />
+		        ))}
+		        
+		        <button type="button" onClick={() => setIngredients([...ingredients, ''])}>
+		          Add Ingredient
+		        </button>
+		        
+		        <button type="submit">Submit</button>
+		      </form>
+		      
+		      {submitted  && (
+		        <div className="recipe-container">
+		          
+		          <h2>Generated Recipe:</h2>
+		          <b>{title}</b>
+		          <p>Preparation Time: {generatedTime}</p>
+		          <p>Cook Time: {cookTime}</p>
+		          <p>Makes {sevings} servings</p>
+
+		          <div className="recipe-section"> 
+		            <p>Ingredients:</p>
+		            <div>
+		              {generatedIngredients.map((ingredient, index) => (
+		                <p key={index} style={{ marginLeft: '20px' }}>{ingredient}</p>
+		              ))}
+		            </div>
+		          </div>
+		          <br></br>
+
+		          <div className="recipe-section"> 
+		            <p>Directions:</p>
+		            <div>
+		              {instructions.map((instruction, index) => (
+		                <p key={index} style={{ marginLeft: '20px' }}>{instruction}</p>
+		              ))}
+		            </div>
+		          </div>
+
+		        </div>
+		      )}
+	      	</div>
+
+
     </div>
+    }
+	</div>
   );
 }
 
