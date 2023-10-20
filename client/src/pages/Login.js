@@ -35,12 +35,12 @@ function Login({user, setUser}) {
         </div>
 
         <div class = "right"> 
-          <div id="login-container">
-            <div class="header">
-              <h1 id="login-title">Wise Cook</h1>
+          <div class="login-container">
+            <div class="header-title">
+              <h1 id="login-title">WiseCook</h1>
             </div>
           
-            <h2> Get Started </h2>
+            <h2 id="login-subtitle"> Get Started </h2>
 
             <div id="signInDiv"></div>
           </div>
