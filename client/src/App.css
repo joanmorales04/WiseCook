@@ -1,66 +1,363 @@
 @import url('https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500&display=swap');
 
-body {
-  background-color: #F5F5DC; /* Subtle olive green */
+/* Login Page */
+
+.split-screen {
+  display: flex;
+  flex-direction: column;
 }
 
+.left {
+  height: 200px
+}
+
+.left, .right {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.left {
+  background-color: pink;
+  background: linear-gradient(rgba(0,0,0,0), rgba(0,0,0,0.5)), url('images/loginpic.png');
+  background-size: cover;
+}
+
+.left .copy {
+  color: white;
+  text-align: center;
+}
+
+@media screen and (min-width: 900px)
+{
+  .split-screen {
+    flex-direction: row;
+    height: 100vh;
+  }
+
+  .left{
+    display: flex;
+    width: 55%;
+    height: auto;
+  }
+
+  .right{
+    display: flex;
+    width: 45%;
+    height: auto;
+  }
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  height: 500px;
+  width: 500px;
+  box-shadow: 0px 3px 15px rgba(0,0,0,0.2);
+  background-color: #e2c9c6;
+  border-radius: 50px;
+}
+
+.header-title {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 100px;
+  gap: 10px;
+  border-radius: 50px;
+  margin-bottom: 20px;
+}
+
+#login-title{
+  font-family: 'Dancing Script', cursive;
+  color: white;
+  font-size: 50px;
+  text-shadow: 1px 1px 5px #8B4513;
+}
+
+#login-subtitle{
+  font-size: 20px;
+  font-family:Verdana, Geneva, Tahoma, sans-serif;
+  color: white;
+  text-shadow: 1px 1px 5px #8B4513;
+  margin-bottom: 20px;
+}
+
+.right {
+  background-color: white;
+}
+
+
+
+
+
+/* Navbar Styling  */
+
+.navbar {
+  background-color: #e2c9c6;
+}
+
+#navbar-title {
+  font-family: 'Dancing Script', cursive;
+  color: #8B4513;
+  font-size: 30px;
+  text-shadow: 1px 1px 5px white;
+}
+
+.me-auto :hover{
+  text-shadow: 1px 1px 5px white;
+}
+
+
+
+
+
+/* Banner Styling */
+
+.hero{
+  height: 21vh;
+  width: 100%;
+  position: relative;
+}
+
+img{
+  height: 100%;
+  width: 100%;
+  object-fit: cover;
+}
+
+.hero-text {
+  position: absolute;
+  top: 12%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.hero-text h2 {
+  font-size: 2rem;
+  background-color: white;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-align: center;
+}
+
+.hero-text p {
+  font-size: 1.2rem;
+  color: white;
+  text-align: center;
+}
+
+@media screen and (max-width:555px){
+  .hero-text h1{
+    padding: 10px 20px;
+  }
+
+  .hero-text p{
+    font-size: 1.1rem;
+    padding: 0 0 2rem 0;
+  }
+}
+
+
+
+
+
+
+
+/* Selection Container */
 .app-container {
-    max-width: 600px;
-    margin: auto;
-    text-align: center;
-    background-color: #FFFAF0; /* FloralWhite - Like an old recipe card */
-    padding: 20px;
-    border: 1px solid #E6E6FA; /* Lavender */
-    box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  display: flex;
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  text-align: center;
+  background-color: #FFFAF0; 
+  border: 1px solid #E6E6FA;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+  padding: 20px;
+  margin-top: 40px;
 }
 
-h1 {
-    font-family: 'Dancing Script', cursive; /* A handwritten-like font for headings. Remember to import it from Google Fonts */
-    color: #8B4513; /* SaddleBrown - Darker text for contrast */
+.app-container-left {
+  flex: 1;
+  justify-content: center;
 }
 
-form {
-    margin-top: 20px;
+.app-container-right {
+  flex: 1;
+  justify-content: center;
 }
 
-select, input {
-    margin: 10px;
-    padding: 10px;
-    display: block;
-    width: 80%;
-    margin-left: auto;
-    margin-right: auto;
-    border: 1px solid #A0522D; /* Sienna - Earthy border color */
-    border-radius: 5px; /* Rounded edges */
+.app-container-headers {
+  font-weight: bold;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
 }
 
-button {
-    cursor: pointer;
-    background-color: #D2691E; /* Chocolate - Earthy button color */
-    color: white;
-    border: none;
-    border-radius: 5px;
-    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-}
 
-button:hover {
-    background-color: #8B4513; /* SaddleBrown - Darken button color on hover */
-}
 
-#signInDiv {
+
+
+/* Select Prep Time */
+.prep-time-buttons-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  text-align: center;
 }
-#welcome {
+
+.prep-time-button {
+  background-color: #8B4513;
+  margin: 0 5px; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.2s ease; 
+}
+
+.prep-time-button:hover {
+  background-color: #D2691E; 
+}
+
+.selected {
+  background-color: #D2691E; 
+  color: white;
+}
+
+
+
+/* Select a Meal Type */
+.meal-type-buttons-container {
   display: flex;
   justify-content: center;
-  align-items: center;
-  text-align: center;
 }
-#login {
+
+.meal-type-button {
+  background-color: #8B4513;
+  margin: 0 5px; 
+  color: white;
+  border: none;
+  border-radius: 5px;
+  transition: background-color 0.2s ease; 
+}
+
+.meal-type-button:hover {
+  background-color: #D2691E; 
+}
+
+.selected {
+  background-color: #D2691E; 
+  color: white;
+}
+
+
+
+
+
+
+
+
+/* Enter An Ingredient */
+input {
+  padding: 10px;
+  width: 30%;
+  border: 1px solid #A0522D; 
+  border-radius: 10px;  
+}
+
+#ingredient-button {
+  margin-top: 10px;
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+#ingredient-button:hover {
+  background-color: #D2691E; 
+}
+
+
+
+
+/* Submit */
+.submit-container {
+  display: flex;
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  text-align: center;
   justify-content: center;
-  align-items: center;
+  padding: 20px;
+}
+
+#submit-button{
+  background-color: #8B4513;
+  height: 30px;
+  width: 90px;
+  color: white;
+  border: none;
+  border-radius: 15px;
+  transition: background-color 0.3s ease; 
+}
+
+#submit-button:hover {
+    background-color: #D2691E; 
+} 
+
+
+
+/* Processing */
+.processing-message {
+  font-size: 25px;
+  font-weight: bold;
+  color: #D2691E;
+  margin-top: 20px;
   text-align: center;
 }
+
+
+/* Generated Recipe Container */
+.generated-recipe-container {
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  margin-top: 30px;
+  padding-top: 20px;
+  text-align: center;
+  background-color: #FFFAF0; 
+  border: 1px solid #E6E6FA;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+}
+
+.recipe-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  background-color: #FFFAF0; 
+  padding: 20px;
+  margin-top: 40px;
+}
+
+.generated-container-left {
+  flex: 1;
+  justify-content: center;
+}
+
+.generated-container-right {
+  flex: 1;
+  text-align: start;
+}
+
+#generated-recipe-title {
+  background-color: yellow;
+}
+
+#directions-title {
+  text-align: center;
+  font-weight: bold;
+}
+
+
+

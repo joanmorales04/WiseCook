@@ -8,12 +8,6 @@ function Login({user, setUser}) {
     var userObject = jwt_decode(response.credential);
     setUser(userObject);
 
-    document.getElementById("login").hidden = true;
-  }
-
-  function handleSignOut(event) {
-    setUser({});
-    document.getElementById("login").hidden = false;
   }
 
   useEffect(() => {
@@ -32,12 +26,28 @@ function Login({user, setUser}) {
 
   return (
     <div className="App">
-      <div id="login">
-        <h1 id="welcome">Welcome Back!</h1>
-        <div id="signInDiv"></div>
+     
+
+      <div className="split-screen">
+        
+        <div class="left">
+          
+        </div>
+
+        <div class = "right"> 
+          <div class="login-container">
+            <div class="header-title">
+              <h1 id="login-title">WiseCook</h1>
+            </div>
+          
+            <h2 id="login-subtitle"> Get Started </h2>
+
+            <div id="signInDiv"></div>
+          </div>
+        </div>
       </div>
 
-      { Object.keys(user).length !== 0 && 
+      {/* { Object.keys(user).length !== 0 && 
         <button onClick={ (e) => handleSignOut(e)}>Sign Out</button>
       }
       
@@ -45,7 +55,7 @@ function Login({user, setUser}) {
         <div>
           <h3>{user.name}</h3>
         </div>
-      }
+      } */}
 
     </div>
   );
