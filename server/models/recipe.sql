@@ -25,6 +25,7 @@ CREATE TABLE recipes2(
 	user_ingredients TEXT[] NOT NULL
 );
 
+
 CREATE TABLE ingredients(
 	id SERIAL PRIMARY KEY, 
 	name VARCHAR(255) NOT NULL
