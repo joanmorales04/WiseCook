@@ -30,7 +30,7 @@ class recipeModel {
 	      }
 	    }
 
-	    // Sort the ranking array in descending order of rank
+	    // Sort the ranking array in descending order of rank 
 	    ranking.sort((a, b) => b.rank - a.rank);
 
 	    // Check if there are any matching recipes
