@@ -3,20 +3,43 @@ const stringSimilarity = require('string-similarity');
 
 class recipeModel {
 
-	static async getAllRecipes() {
-		const query = 'SELECT * FROM recipes';
+	static async getAllRecipes(tabel) {
+		const query = `SELECT * FROM ${table}`;
 		const result = await pool.query(query);
 
 		// console.log("Database:", result.rows);
 		return result.rows;
 	}
+
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
 
 	static async getByIngredients(ingredients) {
-	    const allRecipes = await recipeModel.getAllRecipes();
+
+		const recipeTable;
+
+		const firstIngredient = ingredients[0];
+		const lastIngredient = ingredients[ingredients.length -1];
+
+		const firstCharacter = firstIngredient[0];
+		const lastCharacter = lastIngredient[0];
+
+		if((firstCharacter >= 'a' && firstCharacter <= 'm') && (lastCharacter >= 'a' && lastCharacter <= 'm')){
+			recipeTable = 'recipes';
+		}
+		else if((firstCharacter >= 'n' && firstCharacter <= 'z') && (lastCharacter >= 'n' && lastCharacter <= 'z')){
+			recipeTable = 'recipes2';
+		}else{
+			// its in both databases so check whichever
+			recipeTable = 'recipes';
+		}
+
+	    const allRecipes = await recipeModel.getAllRecipes(recipeTable);
 
 	    // Use a similarity threshold to control the degree of matching
 	    const similarityThreshold = 0.85;
+	    if(ingredients.length < 4){
+	    	similarityThreshold = 70;
+	    }
 
 	    const ranking = [];
 
@@ -45,7 +68,72 @@ class recipeModel {
 	}
 
 
-	static async insert(recipeData, userIngredients) {
+	static async insert(recipeData, userIngredients, table) {
+		try {
+			const recipeObject = JSON.parse(recipeData);
+
+			const query = `
+			INSERT INTO ${table} (title, prep_time, cook_time, servings, user_ingredients, ingredients, instructions)
+			VALUES ($1, $2, $3, $4, $5, $6, $7)
+			RETURNING *`;
+
+			const values = [
+				recipeObject.title,
+				recipeObject.prep_time,
+				recipeObject.cook_time,
+				recipeObject.servings,
+				userIngredients,
+				recipeObject.ingredients,
+				recipeObject.instructions
+			];
+
+			const result = await pool.query(query, values);
+			console.log(`Inserted into the ${table} database:`, result.rows[0]);
+
+			return result.rows[0];
+		} catch (error) {
+		  console.error("Error inserting recipe into the database:", error);
+		  throw error;
+		}
+
+	}
+
+	static async new_insert(recipeData, userIngredients) {
+		try {
+			const firstIngredient = userIngredients[0];
+			const lastIngredient = userIngredients[userIngredients.length -1];
+
+			const firstCharacter = firstIngredient[0];
+			const lastCharacter = lastIngredient[0];
+
+			if((firstCharacter >= 'a' && firstCharacter <= 'm') && (lastCharacter >= 'a' && lastCharacter <= 'm')){
+				recipeModel.insert(recipeData, userIngredients, 'recipes');
+			}
+			if((firstCharacter >= 'n' && firstCharacter <= 'z') && (lastCharacter >= 'n' && lastCharacter <= 'z')){
+				recipeModel.insert(recipeData, userIngredients, 'recipes2');
+			}
+
+		} catch (error) {
+		  console.error("Error inserting recipe into the database:", error);
+		  throw error;
+		}
+
+	}
+
+	static async deleteRecipeById(recipeId) {
+		const query = 'DELETE FROM recipes WHERE id = $1';
+		try {
+			const result = await pool.query(query, [recipeId]);
+			console.log(`Recipe with ID ${recipeId} deleted successfully.`);
+			return true;
+	  	} catch (error) {
+		    console.error(`Error deleting recipe with ID ${recipeId}: ${error}`);
+		    return false;
+	  	}
+	}
+
+
+	static async insert_ingredient(recipeData, userIngredients) {
 		try {
 			const recipeObject = JSON.parse(recipeData);
 
@@ -73,18 +161,6 @@ class recipeModel {
 		  throw error;
 		}
 
-	}
-
-	static async deleteRecipeById(recipeId) {
-		const query = 'DELETE FROM recipes WHERE id = $1';
-		try {
-			const result = await pool.query(query, [recipeId]);
-			console.log(`Recipe with ID ${recipeId} deleted successfully.`);
-			return true;
-	  	} catch (error) {
-		    console.error(`Error deleting recipe with ID ${recipeId}: ${error}`);
-		    return false;
-	  	}
 	}
 
 }

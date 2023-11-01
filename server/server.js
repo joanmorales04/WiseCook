@@ -4,6 +4,7 @@ const cors = require('cors');
 // const recipeRoutes = require('./routes/recipeRoutes');
 const recipeController = require('./controllers/recipeController');
 const recipeModel = require('./models/recipeModel');
+const ingredientModel = require('./models/ingredientModel');
 
 PORT=8080;
 
@@ -41,6 +42,15 @@ app.post('/recipe', async (req, res) => {
 
 	// grab ingredients and time from post request
 	const { prepTime, ingredients } = req.body;
+
+	// check if users ingredients are valid
+	const validIngredients = await ingredientModel.validIngredients(ingredients);
+	if(validIngredients != true){
+		// display error to user that ingredient(s) not valid
+		// end function
+		res.json({recipe: null})
+	}
+
 	ingredients.sort();
 	console.log(ingredients);
 
@@ -60,7 +70,7 @@ app.post('/recipe', async (req, res) => {
 		const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
 
 		// store generated recipe to database, since matching recipe not found
-		const add = await recipeModel.insert(generatedRecipe, ingredients);
+		const add = await recipeModel.new_insert(generatedRecipe, ingredients);
 
 		console.log({recipe: generatedRecipe});
 
