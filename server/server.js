@@ -43,13 +43,15 @@ app.post('/recipe', async (req, res) => {
 	// grab ingredients and time from post request
 	const { prepTime, ingredients } = req.body;
 
-	// check if users ingredients are valid
-	const validIngredients = await ingredientModel.validIngredients(ingredients);
-	if(validIngredients != true){
-		// display error to user that ingredient(s) not valid
-		// end function
-		res.json({recipe: null})
-	}
+	// gets checked by UI first, so ingredients should be valid
+
+	// // check if users ingredients are valid
+	// const validIngredients = await ingredientModel.validIngredients(ingredients);
+	// if(validIngredients != true){
+	// 	// display error to user that ingredient(s) not valid
+	// 	// end function
+	// 	res.json({recipe: null})
+	// }
 
 	ingredients.sort();
 	console.log(ingredients);
@@ -81,7 +83,37 @@ app.post('/recipe', async (req, res) => {
 
 });
 
+app.post('/regenerate', async (req, res) => {
+	const { prepTime, ingredients } = req.body;
 
+	ingredients.sort();
+
+	// use prompt engineering to generate the recipe using the ingredients and time
+	const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients);
+
+	// after getting the prompt, call openai api to send api request to get recipe. 
+	const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
+
+	// store generated recipe to database, since matching recipe not found
+	const add = await recipeModel.new_insert(generatedRecipe, ingredients);
+
+	console.log({recipe: generatedRecipe});
+
+	// return chatgpt response to user
+	res.json({ recipe: generatedRecipe });
+});
+
+app.post('/saverecipe', async (req, res) => {
+
+});
+
+app.post('/unsaverecipe', async (req, res) => {
+
+});
+
+app.post('/allsavedrecipes', async (req, res) => {
+
+});
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));

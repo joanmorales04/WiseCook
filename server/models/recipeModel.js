@@ -1,5 +1,6 @@
 const pool = require('./db');
 const stringSimilarity = require('string-similarity');
+const crypto = require('crypto');
 
 class recipeModel {
 
@@ -12,10 +13,9 @@ class recipeModel {
 	}
 
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
-
 	static async getByIngredients(ingredients) {
 
-		const recipeTable;
+		const recipeTable = '';
 
 		const firstIngredient = ingredients[0];
 		const lastIngredient = ingredients[ingredients.length -1];
@@ -37,7 +37,7 @@ class recipeModel {
 
 	    // Use a similarity threshold to control the degree of matching
 	    const similarityThreshold = 0.85;
-	    if(ingredients.length < 4){
+	    if(ingredients.length <= 4){
 	    	similarityThreshold = 70;
 	    }
 
@@ -72,12 +72,15 @@ class recipeModel {
 		try {
 			const recipeObject = JSON.parse(recipeData);
 
+			const unique_hash = recipeModel.generateRandHash(userIngredients[0], userIngredients[userIngredients.length -1]);
+
 			const query = `
-			INSERT INTO ${table} (title, prep_time, cook_time, servings, user_ingredients, ingredients, instructions)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
+			INSERT INTO ${table} (uid, title, prep_time, cook_time, servings, user_ingredients, ingredients, instructions)
+			VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
 			RETURNING *`;
 
 			const values = [
+				unique_hash,
 				recipeObject.title,
 				recipeObject.prep_time,
 				recipeObject.cook_time,
@@ -133,34 +136,13 @@ class recipeModel {
 	}
 
 
-	static async insert_ingredient(recipeData, userIngredients) {
-		try {
-			const recipeObject = JSON.parse(recipeData);
+	static async generateRandHash(firstWord, lastWord) {
+		// first and last word + time to generate unique hash
+		const dataToHash = `${firstWord}-${lastWord}-${Date.now()}`;
 
-			const query = `
-			INSERT INTO recipes (title, prep_time, cook_time, servings, user_ingredients, ingredients, instructions)
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
-			RETURNING *`;
-
-			const values = [
-				recipeObject.title,
-				recipeObject.prep_time,
-				recipeObject.cook_time,
-				recipeObject.servings,
-				userIngredients,
-				recipeObject.ingredients,
-				recipeObject.instructions
-			];
-
-			const result = await pool.query(query, values);
-			console.log("Inserted into the database:", result.rows[0]);
-
-			return result.rows[0];
-		} catch (error) {
-		  console.error("Error inserting recipe into the database:", error);
-		  throw error;
-		}
-
+		// generate sha256 hash
+		const uniqueHash = crypto.createHash('sha256').update(dataToHash).digest('hex');
+		return uniqueHash;
 	}
 
 }
