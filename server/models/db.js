@@ -1,11 +1,11 @@
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
-	user: "postgres",
-	password: "wc$1001",
-	host: "35.232.17.107",
+	user: "wisecook",
+	password: "wc$100",
+	host: "localhost",
 	port: 5432,
-	database: "wisecook"
+	database: "recipesdb"
 })
 // // testing function
 // async function getAllRecipes() {
@@ -59,4 +59,4 @@ const pool = new Pool({
 //     }
 // })();
 
-// module.exports = pool;
+module.exports = pool;
