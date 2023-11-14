@@ -14,7 +14,7 @@ async function resizeAndEncodeImage(imagePath, width, height) {
   const readFileAsync = promisify(fs.readFile);
   const imageBuffer = await readFileAsync(imagePath);
 
-  // Resize the image to the specified dimensions (e.g., 150x150)
+  // Resize the image to the specified dimensions (ex: 150x150)
   const resizedImageBuffer = await sharp(imageBuffer)
     .resize(width, height)
     .toBuffer();
