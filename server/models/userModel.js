@@ -19,8 +19,8 @@ class userModel {
 	            const user = result.rows[0];
 	            return user;
 	        } else {
-	        	const add = await userModel.insertUser(userObject.name, userObject.email, userObject.sub)
-	            return false;
+	        	const newUser = await userModel.insertUser(userObject.name, userObject.email, userObject.sub)
+	            return newUser;
 	        }
 	    } catch (error) {
 	        console.error("Error finding user in the database:", error);
@@ -35,7 +35,7 @@ class userModel {
 			const query = `
 				INSERT INTO users (user_name, user_email, user_key)
 				VALUES ($1, $2, $3)
-				RETURNING *
+				RETURNING  user_key, rate_limiter, user_recipes
 			`;
 
 			const values = [
