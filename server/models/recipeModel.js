@@ -15,7 +15,7 @@ class recipeModel {
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
 	static async getByIngredients(ingredients) {
 
-		const recipeTable = '';
+		var recipeTable = '';
 
 		const firstIngredient = ingredients[0];
 		const lastIngredient = ingredients[ingredients.length -1];
