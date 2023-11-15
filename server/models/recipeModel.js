@@ -4,7 +4,7 @@ const crypto = require('crypto');
 
 class recipeModel {
 
-	static async getAllRecipes(tabel) {
+	static async getAllRecipes(table) {
 		const query = `SELECT * FROM ${table}`;
 		const result = await pool.query(query);
 
@@ -15,7 +15,7 @@ class recipeModel {
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
 	static async getByIngredients(ingredients) {
 
-		var recipeTable = '';
+		var recipeTable;
 
 		const firstIngredient = ingredients[0];
 		const lastIngredient = ingredients[ingredients.length -1];
@@ -36,7 +36,7 @@ class recipeModel {
 	    const allRecipes = await recipeModel.getAllRecipes(recipeTable);
 
 	    // Use a similarity threshold to control the degree of matching
-	    const similarityThreshold = 0.85;
+	    var similarityThreshold = 0.85;
 	    if(ingredients.length <= 4){
 	    	similarityThreshold = 70;
 	    }
