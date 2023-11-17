@@ -95,12 +95,13 @@ app.post('/regenerate', async (req, res) => {
 	const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
 
 	// store generated recipe to database, since matching recipe not found
-	const add = await recipeModel.new_insert(generatedRecipe, ingredients);
+	var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
+	newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
-	console.log({recipe: generatedRecipe});
+	// console.log({recipe: newGeneratedRecipe});
 
 	// return chatgpt response to user
-	res.json({ recipe: generatedRecipe });
+	res.json({ recipe: newGeneratedRecipe });
 });
 
 app.post('/saverecipe', async (req, res) => {
