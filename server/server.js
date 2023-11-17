@@ -5,6 +5,7 @@ const cors = require('cors');
 const recipeController = require('./controllers/recipeController');
 const recipeModel = require('./models/recipeModel');
 const ingredientModel = require('./models/ingredientModel');
+const userModel = require('./models/userModel');
 
 PORT=8080;
 
@@ -59,7 +60,7 @@ app.post('/recipe', async (req, res) => {
 	const matchingRecipe = await recipeModel.getByIngredients(ingredients);
 
 	if(matchingRecipe != null){
-		console.log("Retrieving matching Recipe!");
+		console.log("Retrieved matching Recipe!");
 
 		const jsonMatchingRecipe = JSON.stringify(matchingRecipe);
 		res.json({recipe: jsonMatchingRecipe});
@@ -72,12 +73,11 @@ app.post('/recipe', async (req, res) => {
 		const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
 
 		// store generated recipe to database, since matching recipe not found
-		const add = await recipeModel.new_insert(generatedRecipe, ingredients);
-
-		console.log({recipe: generatedRecipe});
+		var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
+		newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
 		// return chatgpt response to user
-		res.json({ recipe: generatedRecipe });
+		res.json({ recipe: newGeneratedRecipe });
 	}
 	
 
@@ -104,14 +104,18 @@ app.post('/regenerate', async (req, res) => {
 });
 
 app.post('/saverecipe', async (req, res) => {
+	const { prepTime, ingredients } = req.body;
+
 
 });
+
 
 app.post('/unsaverecipe', async (req, res) => {
 
 });
 
-app.post('/allsavedrecipes', async (req, res) => {
+
+app.get('/allsavedrecipes', async (req, res) => {
 
 });
 

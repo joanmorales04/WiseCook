@@ -15,7 +15,7 @@ class recipeModel {
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
 	static async getByIngredients(ingredients) {
 
-		var recipeTable;
+		var recipeTable = 'recipes';
 
 		const firstIngredient = ingredients[0];
 		const lastIngredient = ingredients[ingredients.length -1];
@@ -30,15 +30,15 @@ class recipeModel {
 			recipeTable = 'recipes2';
 		}else{
 			// its in both databases so check whichever
-			recipeTable = 'recipes';
+			recipeTable = 'recipes2';
 		}
 
 	    const allRecipes = await recipeModel.getAllRecipes(recipeTable);
 
 	    // Use a similarity threshold to control the degree of matching
-	    var similarityThreshold = 0.85;
+	    var similarityThreshold = 0.75;
 	    if(ingredients.length <= 4){
-	    	similarityThreshold = 70;
+	    	similarityThreshold = 0.6;
 	    }
 
 	    const ranking = [];
@@ -62,6 +62,7 @@ class recipeModel {
 	    }
 
 	    // Select the highest ranked recipe (the first element in the ranking array)
+	    // console.log("ranking: "+ ranking);
 	    const highestRankedRecipe = ranking[0].recipe;
 
 	    return highestRankedRecipe;
@@ -72,7 +73,7 @@ class recipeModel {
 		try {
 			const recipeObject = JSON.parse(recipeData);
 
-			const unique_hash = recipeModel.generateRandHash(userIngredients[0], userIngredients[userIngredients.length -1]);
+			const unique_hash = await recipeModel.generateRandHash(userIngredients[0], userIngredients[userIngredients.length -1]);
 
 			const query = `
 			INSERT INTO ${table} (uid, title, prep_time, cook_time, servings, user_ingredients, ingredients, instructions)
@@ -109,12 +110,15 @@ class recipeModel {
 			const firstCharacter = firstIngredient[0];
 			const lastCharacter = lastIngredient[0];
 
-			if((firstCharacter >= 'a' && firstCharacter <= 'm') && (lastCharacter >= 'a' && lastCharacter <= 'm')){
-				recipeModel.insert(recipeData, userIngredients, 'recipes');
+			let result;
+
+			if((firstCharacter >= 'a' && firstCharacter <= 'm')|| (lastCharacter >= 'a' && lastCharacter <= 'm')){
+				result = await recipeModel.insert(recipeData, userIngredients, 'recipes');
 			}
-			if((firstCharacter >= 'n' && firstCharacter <= 'z') && (lastCharacter >= 'n' && lastCharacter <= 'z')){
-				recipeModel.insert(recipeData, userIngredients, 'recipes2');
+			if((firstCharacter >= 'n' && firstCharacter <= 'z') || (lastCharacter >= 'n' && lastCharacter <= 'z')){
+				result = await recipeModel.insert(recipeData, userIngredients, 'recipes2');
 			}
+			return result;
 
 		} catch (error) {
 		  console.error("Error inserting recipe into the database:", error);

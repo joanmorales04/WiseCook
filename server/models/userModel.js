@@ -1,4 +1,3 @@
-
 class userModel {
 
 	static async findUser(userObject) {
