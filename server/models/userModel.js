@@ -71,16 +71,18 @@ class userModel {
 	            const query = `
 	                UPDATE users
 	                SET user_recipes = array_append(user_recipes, $1)
-	                WHERE user_key = $2;
+	                WHERE user_key = $2
+	                RETURNING *;
 	            `;
 	            const values = [recipe_uid, userObject.sub];
 
 	            const result = await pool.query(query, values);
+
 	            console.log("Saved recipe into the database:", result.rows[0]);
-	            return result.rows[0];
+	            return true;
 	        } else {
 	            console.log("Recipe ID already exists in the user_recipes array. Not adding duplicate.");
-	            return null;
+	            return false;
 	        }
 	    } catch (error) {
 	        console.error("Error saving recipe into the database:", error);
@@ -94,13 +96,19 @@ class userModel {
 	        const query = `
 	            UPDATE users
 	            SET user_recipes = array_remove(user_recipes, $1)
-	            WHERE user_key = $2;
+	            WHERE user_key = $2
+	            RETURNING *;
 	        `;
 	        const values = [recipe_uid, userObject.sub];
-
 	        const result = await pool.query(query, values);
+
+			if (result.rows.length === 0) {
+				console.log("Recipe ID not found in the user_recipes array. Nothing to unsave.");
+				return false; // Recipe ID not found
+			}
+
 	        console.log("Unsaved recipe from the database:", result.rows[0]);
-	        return result.rows[0];
+	        return true;
 	    } catch (error) {
 	        console.error("Error unsaving recipe from the database:", error);
 	        throw error;
@@ -109,33 +117,38 @@ class userModel {
 
 	// make a post route that contains the users_recipes and returns all saved recipes in json
 	static async allSavedRecipes(user_recipes) {
-		const recipes = [];
+		try {
+		    const recipes = [];
 
-		for (const uid of user_recipes) {
-			// Try to find the recipe in the 'recipes' table
-			const recipeFromRecipes = await pool.oneOrNone(
-				'SELECT title, prep_time, cook_time, servings, ingredients, instructions ' +
-				'FROM recipes WHERE uid = $1', uid
-			);
+		    if (user_recipes.length === 0) {
+		        return JSON.stringify(recipes); // return empty list 
+		    }
 
-			if (recipeFromRecipes) {
-				recipes.push(recipeFromRecipes);
-			} else {
-				// If not found in 'recipes', try to find in 'recipes2'
-				const recipeFromRecipes2 = await pool.oneOrNone(
-					'SELECT title, prep_time, cook_time, servings, ingredients, instructions ' +
-					'FROM recipes2 WHERE uid = $1', uid
-				);
+		    // Use a single query with the IN clause to fetchrecipes  from both tables
+		    const query = `
+		        SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+		        FROM recipes
+		        WHERE uid IN ($1:csv)
+		        UNION
+		        SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+		        FROM recipes2
+		        WHERE uid IN ($1:csv);
+		    `;
 
-			  if (recipeFromRecipes2) {
-			  	recipes.push(recipeFromRecipes2);
-			  }
-			}
-		}
-		const recipesJSON = JSON.stringify(recipes);
+		    const result = await pool.manyOrNone(query, [user_recipes]);
 
-		return recipesJSON;
+		    for (const recipe of result) {
+		        recipes.push(recipe);
+		    }
+
+		    const recipesJSON = JSON.stringify(recipes);
+		    return recipesJSON;
+		} catch (error) {
+		    console.error("Error fetching saved recipes from the database:", error);
+		    throw error;
+	    }
 	}
+
 
 
 
