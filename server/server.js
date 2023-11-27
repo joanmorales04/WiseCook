@@ -173,10 +173,11 @@ app.get('/allsavedrecipes', async (req, res) => {
 app.post('/imagetorecipe', async (req, res) => {
 	const { image_name } = req.body;
 
-	const generateRecipe = await visionController.generateRecipeFromImage(`./${}`, image_name);
+	const generateRecipe = await visionController.generateRecipeFromImage(`./${image_name}`);
 
 	res.json({ recipe: generateRecipe });
 });
+
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
