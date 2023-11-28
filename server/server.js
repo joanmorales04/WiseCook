@@ -37,6 +37,21 @@ app.get('/recipes', (req, res) => {
 	// talk to database
 });
 
+app.post('/login', async (req, res) => {
+	try {
+		const { userObject } = req.body;
+
+		var userData = await userModel.findUser(userObject);
+		userData = JSON.stringify(userData);
+		
+		res.json({ user: userData });
+
+	} catch (error) {
+		console.error('Error loggin in:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+});
+
 
 // Handle other routes or API endpoints here
 app.post('/recipe', async (req, res) => {
