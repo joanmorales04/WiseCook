@@ -134,14 +134,23 @@ app.post('/saverecipe', async (req, res) => {
     try {
         const save = await userModel.saveRecipe(user_key, uid);
 
-        if(save) {
-            res.status(200).send('Recipe saved successfully');
+        if(save.success) {
+            res.status(200).json({
+                message: 'Recipe saved successfully',
+                user: save.user
+            });
         }else {
-            res.status(500).send('Error saving recipe');
+            res.status(500).json({
+                message: 'Error saving recipe',
+                user: null
+            });
         }
 	} catch(error) {
 		console.error('Error saving recipe:', error);
-		res.status(500).send('Internal Server Error');
+        res.status(500).json({
+            message: 'Internal Server Error',
+            user: null
+        });
 	}
 
 
@@ -154,14 +163,23 @@ app.post('/unsaverecipe', async (req, res) => {
     try {
         const unSave = await userModel.unsaveRecipe(user_key, uid);
 
-        if(save) {
-            res.status(200).send('Recipe unsaved successfully');
+        if(unSave.success) {
+            res.status(200).json({
+                message: 'Recipe unsaved successfully',
+                user: save.user
+            });
         }else {
-            res.status(500).send('Error unnsaving recipe');
+            res.status(500).json({
+                message: 'Error unsaving recipe',
+                user: null
+            });
         }
 	} catch(error) {
 		console.error('Error unsaving recipe:', error);
-		res.status(500).send('Internal Server Error');
+        res.status(500).json({
+            message: 'Internal Server Error',
+            user: null
+        });
 	}
 });
 

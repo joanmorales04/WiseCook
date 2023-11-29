@@ -74,17 +74,17 @@ class userModel {
 	                UPDATE users
 	                SET user_recipes = array_append(user_recipes, $1)
 	                WHERE user_key = $2
-	                RETURNING *;
+	                RETURNING user_name, user_key, rate_limiter, user_recipes;
 	            `;
 	            const values = [recipe_uid, user.user_key];
 
 	            const result = await pool.query(query, values);
 
 	            console.log("Saved recipe into the database:", result.rows[0]);
-	            return true;
+	            return { success: true, message: "Recipe successfully saved.", user: result.rows[0] };
 	        } else {
 	            console.log("Recipe ID already exists in the user_recipes array. Not adding duplicate.");
-	            return false;
+	            return { success: false, message: "Recipe ID already exists.", user: null };
 	        }
 	    } catch (error) {
 	        console.error("Error saving recipe into the database:", error);
@@ -99,18 +99,18 @@ class userModel {
 	            UPDATE users
 	            SET user_recipes = array_remove(user_recipes, $1)
 	            WHERE user_key = $2
-	            RETURNING *;
+	            RETURNING user_name, user_key, rate_limiter, user_recipes;
 	        `;
 	        const values = [recipe_uid, user.user_key];
 	        const result = await pool.query(query, values);
 
 			if (result.rows.length === 0) {
 				console.log("Recipe ID not found in the user_recipes array. Nothing to unsave.");
-				return false; // Recipe ID not found
+	            return {success: false, message: "Recipe ID not found in the user's recipe. Nothing to unsave."};
 			}
 
 	        console.log("Unsaved recipe from the database:", result.rows[0]);
-	        return true;
+	        return { success: true, message: "Recipe successfully unsaved.", user: result.rows[0] };
 	    } catch (error) {
 	        console.error("Error unsaving recipe from the database:", error);
 	        throw error;
@@ -127,15 +127,15 @@ class userModel {
 		    }
 
 		    // Use a single query with the IN clause to fetchrecipes  from both tables
-		    const query = `
-		        SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
-		        FROM recipes
-		        WHERE uid IN ($1:csv)
-		        UNION
-		        SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
-		        FROM recipes2
-		        WHERE uid IN ($1:csv);
-		    `;
+	        const query = `
+	            SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+	            FROM recipes
+	            WHERE uid IN ($1)
+	            UNION
+	            SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+	            FROM recipes2
+	            WHERE uid IN ($1);
+	        `;
 
 		    const result = await pool.manyOrNone(query, [user.user_recipes]);
 
