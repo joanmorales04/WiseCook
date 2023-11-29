@@ -55,7 +55,7 @@ class userModel {
 		}
 	}
 
-	static async saveRecipe(userObject, recipe_uid) {
+	static async saveRecipe(user, recipe_uid) {
 	    try {
 	        // Check if the recipe_uid already exists in the user's user_recipes array in the db
 	        const checkQuery = `
@@ -63,7 +63,7 @@ class userModel {
 	            FROM users
 	            WHERE user_key = $1;
 	        `;
-	        const checkValues = [userObject.uid];
+	        const checkValues = [user.user_key];
 
 	        const checkResult = await pool.query(checkQuery, checkValues);
 	        const userRecipes = checkResult.rows[0].user_recipes || [];
@@ -76,7 +76,7 @@ class userModel {
 	                WHERE user_key = $2
 	                RETURNING *;
 	            `;
-	            const values = [recipe_uid, userObject.uid];
+	            const values = [recipe_uid, user.user_key];
 
 	            const result = await pool.query(query, values);
 
@@ -93,7 +93,7 @@ class userModel {
 	}
 
 
-	static async unsaveRecipe(userObject, recipe_uid) {
+	static async unsaveRecipe(user, recipe_uid) {
 	    try {
 	        const query = `
 	            UPDATE users
@@ -101,7 +101,7 @@ class userModel {
 	            WHERE user_key = $2
 	            RETURNING *;
 	        `;
-	        const values = [recipe_uid, userObject.sub];
+	        const values = [recipe_uid, user.user_key];
 	        const result = await pool.query(query, values);
 
 			if (result.rows.length === 0) {
