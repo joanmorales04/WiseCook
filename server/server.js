@@ -166,7 +166,7 @@ app.post('/unsaverecipe', async (req, res) => {
         if(unSave.success) {
             res.status(200).json({
                 message: 'Recipe unsaved successfully',
-                user: save.user
+                user: unSave.user
             });
         }else {
             res.status(500).json({
