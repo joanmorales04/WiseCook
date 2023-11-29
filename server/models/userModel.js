@@ -54,6 +54,7 @@ class userModel {
 			throw error;
 		}
 	}
+	
 
 	static async saveRecipe(user, recipe_uid) {
 	    try {
@@ -84,7 +85,7 @@ class userModel {
 	            return { success: true, message: "Recipe successfully saved.", user: result.rows[0] };
 	        } else {
 	            console.log("Recipe ID already exists in the user_recipes array. Not adding duplicate.");
-	            return { success: false, message: "Recipe ID already exists.", user: null };
+	            return { success: false, message: "Recipe ID is already saved.", user: null };
 	        }
 	    } catch (error) {
 	        console.error("Error saving recipe into the database:", error);
@@ -150,6 +151,36 @@ class userModel {
 		    throw error;
 	    }
 	}
+
+	static async decreaseRateLimiter(user) {
+	    try {
+	        const newRateLimiter = user.rate_limiter - 1;
+
+	        const query = `
+	            UPDATE users
+	            SET rate_limiter = $1
+	            WHERE user_key = $2
+	            RETURNING user_name, user_key, rate_limiter, user_recipes;
+	        `;
+
+	        const values = [newRateLimiter, user.user_key];
+
+	        const result = await pool.query(query, values);
+
+	        if (result.rows.length > 0) {
+	            console.log("Decreased rate limiter for user:", result.rows[0]);
+	            return { success: true, message: "Rate limiter decreased successfully.", user: result.rows[0] };
+	        } else {
+	            console.log("User not found. Rate limiter not decreased.");
+	            return { success: false, message: "User not found. Rate limiter not decreased.", user: null };
+	        }
+	    } catch (error) {
+	        console.error("Error decreasing rate limiter:", error);
+	        throw error;
+	    }
+	}
+
+
 
 
 

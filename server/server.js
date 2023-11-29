@@ -97,6 +97,7 @@ app.post('/recipe', async (req, res) => {
 			newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
 			// return chatgpt response to user
+			
 			res.json({ recipe: newGeneratedRecipe });
 		}
    } catch (error) {
@@ -132,7 +133,7 @@ app.post('/saverecipe', async (req, res) => {
 	const { user_key, recipeID } = req.body;
 
     try {
-        const save = await userModel.saveRecipe(user_key, uid);
+        const save = await userModel.saveRecipe(user_key, recipeID);
 
         if(save.success) {
             res.status(200).json({
@@ -153,15 +154,14 @@ app.post('/saverecipe', async (req, res) => {
         });
 	}
 
-
 });
 
 
 app.post('/unsaverecipe', async (req, res) => {
-	const { user_key, uid } = req.body;
+	const { user_key, recipeID } = req.body;
 
     try {
-        const unSave = await userModel.unsaveRecipe(user_key, uid);
+        const unSave = await userModel.unsaveRecipe(user_key, recipeID);
 
         if(unSave.success) {
             res.status(200).json({
@@ -205,14 +205,41 @@ app.get('/allsavedrecipes', async (req, res) => {
 });
 
 
+app.post('/updateratelimit', async (req, res) => {
+    try {
+        const { user } = req.body;
+
+        const updatedUser = await userModel.decreaseRateLimiter(user);
+
+        if (updatedUser.success) {
+            res.status(200).json({
+                message: 'Rate limiter decreased successfully',
+                user: updatedUser.user
+            });
+        } else {
+            res.status(404).json({
+                message: 'User not found. Rate limiter not decreased.',
+                user: null
+            });
+        }
+    } catch (error) {
+        console.error('Error updating rate limiter:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            user: null
+        });
+    }
+});
+
+
+
 app.post('/imagetorecipe', async (req, res) => {
 	const { image_buffer } = req.body;
 
-	const generateRecipe = await visionController.generateRecipeFromImage(`./${image_name}`);
+	const generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
 
 	res.json({ recipe: generateRecipe });
 });
-
 
 
 app.listen(PORT, () => console.log(`Server listening on port ${PORT}`));
