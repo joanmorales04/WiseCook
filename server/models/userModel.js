@@ -1,3 +1,5 @@
+const pool = require('./db');
+
 class userModel {
 
 	static async findUser(userObject) {

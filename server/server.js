@@ -6,6 +6,8 @@ const recipeController = require('./controllers/recipeController');
 const recipeModel = require('./models/recipeModel');
 const ingredientModel = require('./models/ingredientModel');
 const userModel = require('./models/userModel');
+const visionController = require('./controllers/visionController');
+
 
 PORT=8080;
 
@@ -43,7 +45,7 @@ app.post('/login', async (req, res) => {
 
 		var userData = await userModel.findUser(userObject);
 		userData = JSON.stringify(userData);
-		
+
 		res.json({ user: userData });
 
 	} catch (error) {
@@ -127,7 +129,7 @@ app.post('/regenerate', async (req, res) => {
 
 
 app.post('/saverecipe', async (req, res) => {
-	const { user_key, uid } = req.body;
+	const { user_key, recipeID } = req.body;
 
     try {
         const save = await userModel.saveRecipe(user_key, uid);
