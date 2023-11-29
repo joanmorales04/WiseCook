@@ -6,7 +6,7 @@ class userModel {
 	    try {
 	        // Query the database to find the user based on the user_key
 	        const query = `
-	            SELECT user_key, rate_limiter, user_recipes
+	            SELECT user_key, rate_limiter, user_recipes, user_name
 	            FROM users
 	            WHERE user_key = $1
 	        `;
@@ -36,7 +36,7 @@ class userModel {
 			const query = `
 				INSERT INTO users (user_name, user_email, user_key)
 				VALUES ($1, $2, $3)
-				RETURNING  user_key, rate_limiter, user_recipes
+				RETURNING  user_name, user_key, rate_limiter, user_recipes
 			`;
 
 			const values = [
