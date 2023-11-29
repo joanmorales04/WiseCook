@@ -167,7 +167,7 @@ app.post('/unsaverecipe', async (req, res) => {
 
 
 app.get('/allsavedrecipes', async (req, res) => {
-	const { user_recipes } = req.body;
+	const { user } = req.body;
     try {
         if (!user_recipes) {
             return res.status(400).json({ error: 'user_recipes parameter is missing.' });
@@ -188,7 +188,7 @@ app.get('/allsavedrecipes', async (req, res) => {
 
 
 app.post('/imagetorecipe', async (req, res) => {
-	const { image_name } = req.body;
+	const { image_buffer } = req.body;
 
 	const generateRecipe = await visionController.generateRecipeFromImage(`./${image_name}`);
 

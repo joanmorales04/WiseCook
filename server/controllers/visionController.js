@@ -10,9 +10,9 @@ const openai = new OpenAI({
 });
 
 // Function to resize and encode the image
-async function resizeAndEncodeImage(imagePath, width, height) {
-  const readFileAsync = promisify(fs.readFile);
-  const imageBuffer = await readFileAsync(imagePath);
+async function resizeAndEncodeImage(imageBuffer, width, height) {
+  // const readFileAsync = promisify(fs.readFile);
+  // const imageBuffer = await readFileAsync(imagePath);
 
   // Resize the image to the specified dimensions (ex: 150x150)
   const resizedImageBuffer = await sharp(imageBuffer)

@@ -63,7 +63,7 @@ class userModel {
 	            FROM users
 	            WHERE user_key = $1;
 	        `;
-	        const checkValues = [userObject.sub];
+	        const checkValues = [userObject.uid];
 
 	        const checkResult = await pool.query(checkQuery, checkValues);
 	        const userRecipes = checkResult.rows[0].user_recipes || [];
@@ -76,7 +76,7 @@ class userModel {
 	                WHERE user_key = $2
 	                RETURNING *;
 	            `;
-	            const values = [recipe_uid, userObject.sub];
+	            const values = [recipe_uid, userObject.uid];
 
 	            const result = await pool.query(query, values);
 
@@ -118,11 +118,11 @@ class userModel {
 	}
 
 	// make a post route that contains the users_recipes and returns all saved recipes in json
-	static async allSavedRecipes(user_recipes) {
+	static async allSavedRecipes(user) {
 		try {
 		    const recipes = [];
 
-		    if (user_recipes.length === 0) {
+		    if (user.user_recipes.length === 0) {
 		        return JSON.stringify(recipes); // return empty list 
 		    }
 
@@ -137,7 +137,7 @@ class userModel {
 		        WHERE uid IN ($1:csv);
 		    `;
 
-		    const result = await pool.manyOrNone(query, [user_recipes]);
+		    const result = await pool.manyOrNone(query, [user.user_recipes]);
 
 		    for (const recipe of result) {
 		        recipes.push(recipe);
