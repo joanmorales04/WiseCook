@@ -225,7 +225,6 @@ app.post('/updateratelimit', async (req, res) => {
 });
 
 
-
 app.post('/imagetorecipe', async (req, res) => {
 	const { image_buffer } = req.body;
 

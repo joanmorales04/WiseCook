@@ -124,7 +124,7 @@ class userModel {
 			const recipes = [];
 
 			if (user.user_recipes.length === 0) {
-				return JSON.stringify(recipes); // return empty list 
+				return JSON.stringify(recipes); // return empty list since no saves
 			}
 
 			// fetch recipe from both recipes and recipes2, no dups since UNION
