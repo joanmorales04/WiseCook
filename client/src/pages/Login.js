@@ -1,14 +1,35 @@
 import React, { useState } from 'react';
 import { useEffect } from 'react';
 import jwt_decode from "jwt-decode";
+import { useNavigate } from 'react-router-dom';
 
-function Login({user, setUser}) {
+function Login({setUser}) {
+  const navigate = useNavigate(); 
 
-  function handleCallbackResponse(response) {
-    var userObject = jwt_decode(response.credential);
-    setUser(userObject);
+  async function handleCallbackResponse(response) {
+    const userObject = jwt_decode(response.credential);
 
-  }
+    try {
+        const res = await fetch('http://localhost:8080/login', { 
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ userObject:userObject }), // Sending userObject within an object as expected by the server
+        });
+
+        if (res.ok) {
+            const data = await res.json();
+            const userData = JSON.parse(data.user); // Parse the user data since it's sent as a string
+            setUser(userData); // setting setUser as userData (userData, being the output of the API Endpoint)
+            navigate('/home');
+        } else {
+            throw new Error('Failed to login');
+        }
+    } catch (error) {
+        console.error('Error logging in:', error);
+    }
+}
 
   useEffect(() => {
     /* global google */
@@ -22,21 +43,20 @@ function Login({user, setUser}) {
       { theme: "outline", size: "large", type: "standard", width: 270, text: 'continue_with'}
     );
 
-  }, []);
+  }, [navigate]);
 
   return (
     <div className="App">
      
-
       <div className="split-screen">
         
-        <div class="left">
+        <div className="left">
           
         </div>
 
-        <div class = "right"> 
-          <div class="login-container">
-            <div class="header-title">
+        <div className = "right"> 
+          <div className="login-container">
+            <div className="header-title">
               <h1 id="login-title">WiseCook</h1>
             </div>
           
@@ -46,16 +66,6 @@ function Login({user, setUser}) {
           </div>
         </div>
       </div>
-
-      {/* { Object.keys(user).length !== 0 && 
-        <button onClick={ (e) => handleSignOut(e)}>Sign Out</button>
-      }
-      
-      { user && 
-        <div>
-          <h3>{user.name}</h3>
-        </div>
-      } */}
 
     </div>
   );

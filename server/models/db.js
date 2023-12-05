@@ -1,12 +1,26 @@
 const Pool = require('pg').Pool;
 
 const pool = new Pool({
-	user: "wisecook",
-	password: "wc$100",
-	host: "localhost",
+	user: "postgres",
+	password: "wc$1001",
+	host: "35.232.17.107",
 	port: 5432,
-	database: "recipesdb"
+	database: "wisecook"
 })
+
+// async function getAllIngredients() {
+// 	const query = 'SELECT * FROM recipes';
+// 	const result = await pool.query(query);
+
+// 	console.log("Database:", result.rows);
+// 	return result.rows;
+// }
+// (async () => {
+// 	const allIngred = await getAllIngredients();
+
+// })();
+
+
 // // testing function
 // async function getAllRecipes() {
 //   const query = 'SELECT * FROM recipes';
@@ -58,5 +72,53 @@ const pool = new Pool({
 //         console.error('Error:', error);
 //     }
 // })();
+
+
+
+// async function getRecipe(user_recipes) {
+//   try {
+//     const recipes = [];
+
+//     if (user_recipes.length === 0) {
+//       return JSON.stringify(recipes); // return empty list 
+//     }
+
+//     // Use a single query with the IN clause to fetch recipes from both tables
+//     const query = `
+//       SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+//       FROM recipes
+//       WHERE uid = ANY($1)
+//       UNION
+//       SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+//       FROM recipes2
+//       WHERE uid = ANY($1);
+//     `;
+
+//     const result = await pool.query(query, [user_recipes]);
+
+//     for (const recipe of result.rows) {
+//       recipes.push(recipe);
+//     }
+
+//     const recipesJSON = JSON.stringify(recipes);
+//     return recipesJSON;
+//   } catch (error) {
+//     console.error("Error fetching saved recipes from the database:", error);
+//     throw error;
+//   }
+// }
+
+// (async () => {
+//   try {
+//     const userRecipes = await getRecipe(['596141eb402e57340b6d5f6c55e768fa9987435911e4003d41941878783fd6ca', 'c2a0b62b50f50154a569ac36a84d22a5d21692011de29af4d57ee3816d6adfd5']);
+//     console.log("user Recipes:", userRecipes);
+//   } catch (error) {
+//     console.error("Error:", error);
+//   }
+// })();
+
+
+
+
 
 module.exports = pool;

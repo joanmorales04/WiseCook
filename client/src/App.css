@@ -122,7 +122,7 @@
   position: relative;
 }
 
-img{
+.hero-image{
   height: 100%;
   width: 100%;
   object-fit: cover;
@@ -177,7 +177,6 @@ img{
   border: 1px solid #E6E6FA;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
   padding: 20px;
-  margin-top: 40px;
 }
 
 .app-container-left {
@@ -218,7 +217,7 @@ img{
   background-color: #D2691E; 
 }
 
-.selected {
+.selectedPrepTime {
   background-color: #D2691E; 
   color: white;
 }
@@ -244,7 +243,7 @@ img{
   background-color: #D2691E; 
 }
 
-.selected {
+.selectedMealType {
   background-color: #D2691E; 
   color: white;
 }
@@ -359,5 +358,149 @@ input {
   font-weight: bold;
 }
 
+.suggestions-container{
+  background-color: red;
+  display: flex;
+  justify-content: center;
+}
 
 
+
+.suggestions {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  width: calc(25% - 50px); 
+}
+
+.suggestions li {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestions li:hover {
+  background: #f0f0f0;
+}
+
+.button-container-a {
+  display: flex;
+  justify-content: space-around; /* This will distribute the space around the buttons */
+  align-items: center;
+  padding: 10px;
+}
+
+/* Adjust this class if you have a specific class for the Save Recipe button */
+.save-recipe-button {
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.save-recipe-button:hover {
+  background-color: #D2691E;
+}
+
+
+.unsave-recipe-button {
+  background-color: #D2691E;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.generate-recipe-button {
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.generate-recipe-button:hover {
+  background-color: #D2691E;
+}
+
+
+
+
+.tabs{
+  display: flex;
+  justify-content: center;
+  margin-top: 40px; 
+  margin-bottom: 0px;
+}
+
+.selectedTab {
+  width: 45%;
+  background-color: #D2691E;;
+  color: white;
+  border: none;
+  border-radius: 2px;
+  transition: background-color 0.2s ease; 
+}
+
+.notselectedTab {
+  width: 45%;
+  background-color: #D3D3D3;
+  color: black;
+  border: none;
+  border-radius: 2px;
+  transition: background-color 0.2s ease; 
+}
+
+
+.app-savedrecipes-container {
+  display: flex;
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  text-align: center;
+  background-color: #FFFAF0; 
+  border: 1px solid #E6E6FA;
+  margin-top: 40px;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+  padding: 20px;
+  justify-content: center;
+}
+
+
+.image-input {
+  width: 38%;
+  color: #8B4513;
+  background-color: white;
+  margin: 20px;
+
+}
+
+.imageToRecipeImage{
+  width: 35%;
+  margin-left: 20px;
+}
+
+.savedrecipes-container {
+  display: flex;
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  justify-content: center;
+  text-align: center;
+  background-color: #FFFAF0; 
+  border: 1px solid #E6E6FA;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+  padding: 20px;
+  margin-top: 40px;
+}

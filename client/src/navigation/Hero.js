@@ -5,9 +5,8 @@ const Hero = (props) => {
 
     <div className={props.cName}>
 
-      <img alt="heroImage"  src={props.heroImg}> 
+      <img className="hero-image" alt="heroImage"  src={props.heroImg}> 
       </img>
-
 
       <div className="hero-text">
 
@@ -18,9 +17,6 @@ const Hero = (props) => {
       </div>
 
     </div>
-
-    
-  
   );
 };
 
