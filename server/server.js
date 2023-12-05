@@ -97,7 +97,7 @@ app.post('/recipe', async (req, res) => {
 			newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
 			// return chatgpt response to user
-			
+
 			res.json({ recipe: newGeneratedRecipe });
 		}
    } catch (error) {
@@ -187,17 +187,10 @@ app.post('/unsaverecipe', async (req, res) => {
 app.get('/allsavedrecipes', async (req, res) => {
 	const { user } = req.body;
     try {
-        if (!user_recipes) {
-            return res.status(400).json({ error: 'user_recipes parameter is missing.' });
-        }
 
-        // Parse the user_recipes parameter into an array
-        const userRecipesArray = JSON.parse(user_recipes);
+        const recipesJSON = await userModel.allSavedRecipes(user);
 
-        // Call the allSavedRecipes function
-        const recipesJSON = await userModel.allSavedRecipes(userRecipesArray);
-
-        res.json({ recipes: recipesJSON });
+        res.status(200).json({ recipes: recipesJSON });
     } catch (error) {
         console.error('Error fetching saved recipes:', error);
         res.status(500).json({ error: 'Internal Server Error' });
@@ -239,6 +232,20 @@ app.post('/imagetorecipe', async (req, res) => {
 	const generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
 
 	res.json({ recipe: generateRecipe });
+});
+
+
+app.get('/ingredients', async (req, res) => {
+	try {
+		var allIngredients = await ingredientModel.getAllIngredients();
+		allIngredients = JSON.stringify(allIngredients);
+
+		res.json({ingredients: allIngredients});
+	} catch(error) {
+		console.error('Error retrieving all valid ingredients:', error);
+		res.status(500).json({ error: 'Internal Server Error' });
+	}
+
 });
 
 

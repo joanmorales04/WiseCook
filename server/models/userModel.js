@@ -54,7 +54,7 @@ class userModel {
 			throw error;
 		}
 	}
-	
+
 
 	static async saveRecipe(user, recipe_uid) {
 	    try {
@@ -118,38 +118,38 @@ class userModel {
 	    }
 	}
 
-	// make a post route that contains the users_recipes and returns all saved recipes in json
+	
 	static async allSavedRecipes(user) {
 		try {
-		    const recipes = [];
+			const recipes = [];
 
-		    if (user.user_recipes.length === 0) {
-		        return JSON.stringify(recipes); // return empty list 
-		    }
+			if (user.user_recipes.length === 0) {
+				return JSON.stringify(recipes); // return empty list 
+			}
 
-		    // Use a single query with the IN clause to fetchrecipes  from both tables
-	        const query = `
-	            SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
-	            FROM recipes
-	            WHERE uid IN ($1)
-	            UNION
-	            SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
-	            FROM recipes2
-	            WHERE uid IN ($1);
-	        `;
+			// fetch recipe from both recipes and recipes2, no dups since UNION
+			const query = `
+				SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+				FROM recipes
+				WHERE uid = ANY($1)
+				UNION
+				SELECT title, prep_time, cook_time, servings, ingredients, instructions, uid
+				FROM recipes2
+				WHERE uid = ANY($1);
+			`;
 
-		    const result = await pool.manyOrNone(query, [user.user_recipes]);
+			const result = await pool.query(query, [user.user_recipes]);
 
-		    for (const recipe of result) {
-		        recipes.push(recipe);
-		    }
+			for (const recipe of result.rows) {
+				recipes.push(recipe);
+			}
 
-		    const recipesJSON = JSON.stringify(recipes);
-		    return recipesJSON;
+			const recipesJSON = JSON.stringify(recipes);
+			return recipesJSON;
 		} catch (error) {
-		    console.error("Error fetching saved recipes from the database:", error);
-		    throw error;
-	    }
+			console.error("Error fetching saved recipes from the database:", error);
+			throw error;
+		}
 	}
 
 	static async decreaseRateLimiter(user) {
