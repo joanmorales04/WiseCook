@@ -154,7 +154,12 @@ class userModel {
 
 	static async decreaseRateLimiter(user) {
 	    try {
-	        const newRateLimiter = user.rate_limiter - 1;
+	        var newRateLimiter = user.rate_limiter;
+	        if(newRateLimiter > 0){
+	        	newRateLimiter = user.rate_limiter - 1;
+	        }else {
+	        	return { success: false, message: "User rate limit reached ", user: user };
+	        }
 
 	        const query = `
 	            UPDATE users
