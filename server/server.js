@@ -222,31 +222,31 @@ app.get('/allsavedrecipes', async (req, res) => {
 });
 
 
-// app.post('/updateratelimit', async (req, res) => {
-//     try {
-//         const { user } = req.body;
+app.post('/updateratelimit', async (req, res) => {
+    try {
+        const { user } = req.body;
 
-//         const updatedUser = await userModel.decreaseRateLimiter(user);
+        const updatedUser = await userModel.decreaseRateLimiter(user);
 
-//         if (updatedUser.success) {
-//             res.status(200).json({
-//                 message: 'Rate limiter decreased successfully',
-//                 user: updatedUser.user
-//             });
-//         } else {
-//             res.status(404).json({
-//                 message: 'User not found. Rate limiter not decreased.',
-//                 user: null
-//             });
-//         }
-//     } catch (error) {
-//         console.error('Error updating rate limiter:', error);
-//         res.status(500).json({
-//             message: 'Internal Server Error',
-//             user: null
-//         });
-//     }
-// });
+        if (updatedUser.success) {
+            res.status(200).json({
+                message: 'Rate limiter decreased successfully',
+                user: updatedUser.user
+            });
+        } else {
+            res.status(404).json({
+                message: 'User not found. Rate limiter not decreased.',
+                user: null
+            });
+        }
+    } catch (error) {
+        console.error('Error updating rate limiter:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            user: null
+        });
+    }
+});
 
 
 
