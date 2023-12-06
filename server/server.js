@@ -59,7 +59,7 @@ app.post('/login', async (req, res) => {
 app.post('/recipe', async (req, res) => {
 	try {
 		// grab ingredients and time from post request
-		const { prepTime, ingredients, user } = req.body;
+		const { prepTime, ingredients } = req.body;
 
 		ingredients.sort();
 		console.log(ingredients);
@@ -75,29 +75,25 @@ app.post('/recipe', async (req, res) => {
 			const jsonMatchingRecipe = JSON.stringify(matchingRecipe);
 			res.json({recipe: jsonMatchingRecipe});
 		}else{
-			var user_limit = user.rate_limiter;
-			if(user_limit != 0){
-				console.log("Didn't retrieve from database");
+			console.log("Didn't retrieve from database");
 
-				// use prompt engineering to generate the recipe using the ingredients and time
-				const generatedPrompt = await recipeController.generatePrompt(prepTime, ingredients);
+			// use prompt engineering to generate the recipe using the ingredients and time
+			const generatedPrompt = await recipeController.generatePrompt(prepTime, ingredients);
 
-				// after getting the prompt, call openai api to send api request to get recipe
-				const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
+			// after getting the prompt, call openai api to send api request to get recipe
+			const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
 
-				// store generated recipe to database, since matching recipe not found
-				var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
-				newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
+			// store generated recipe to database, since matching recipe not found
+			var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
+			newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
-				// decrease rate limit by 1
-				var limitUser = await userModel.decreaseRateLimiter(user);
-				limitUser = JSON.stringify(limitUser);
+			// // decrease rate limit by 1
+			// var limitUser = await userModel.decreaseRateLimiter(user);
+			// limitUser = JSON.stringify(limitUser);
 
-				// return chatgpt response to user
-				res.json({ recipe: newGeneratedRecipe, user: limitUser.user });
-			}else {
-				res.json({recipe: null, user: user});
-			}
+			// return chatgpt response to user
+			res.json({ recipe: newGeneratedRecipe });
+			
 		}
    } catch (error) {
 		console.error('Error processing recipe request:', error);
@@ -108,31 +104,26 @@ app.post('/recipe', async (req, res) => {
 
 
 app.post('/regenerate', async (req, res) => {
-	const { prepTime, ingredients, user } = req.body;
+	const { prepTime, ingredients } = req.body;
 
 	ingredients.sort();
 
 	try {
-		var user_limit = user.rate_limiter;
-		if(user_limit != 0){
-			// use prompt engineering to generate the recipe using the ingredients and time
-			const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients);
+		// use prompt engineering to generate the recipe using the ingredients and time
+		const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients);
 
-			// after getting the prompt, call openai api to send api request to get recipe. 
-			const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
+		// after getting the prompt, call openai api to send api request to get recipe. 
+		const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
 
-			// store generated recipe to database, since matching recipe not found
-			var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
-			newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
+		// store generated recipe to database, since matching recipe not found
+		var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
+		newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
-			var limitUser = await userModel.decreaseRateLimiter(user);
-			limitUser = JSON.stringify(limitUser);
+		// var limitUser = await userModel.decreaseRateLimiter(user);
+		// limitUser = JSON.stringify(limitUser);
 
-			// return chatgpt response to user
-			res.json({ recipe: newGeneratedRecipe, user: limitUser.user });
-		} else {
-			res.json({ recipe: null, user: user });
-		}
+		// return chatgpt response to user
+		res.json({ recipe: newGeneratedRecipe });
 
     } catch (error) {
         console.error('Error in regeneration process:', error);
@@ -143,21 +134,16 @@ app.post('/regenerate', async (req, res) => {
 
 
 app.post('/imagetorecipe', async (req, res) => {
-	const { image_buffer, user } = req.body;
+	const { image_buffer } = req.body;
 
 	try {
-		var user_limit = user.rate_limiter;
-		if(user_limit != 0) {
-			var generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
-			generateRecipe = JSON.stringify(generateRecipe);
+		var generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
+		generateRecipe = JSON.stringify(generateRecipe);
 
-			var limitUser = await userModel.decreaseRateLimiter(user);
-			limitUser = JSON.stringify(limitUser);
+		// var limitUser = await userModel.decreaseRateLimiter(user);
+		// limitUser = JSON.stringify(limitUser);
 
-			res.json({ recipe: generateRecipe, user: limitUser.user });
-		} else {
-			res.json({ recipe: null, user: user });
-		}
+		res.json({ recipe: generateRecipe });
 
 	} catch(error) {
         console.error('Error in processing image:', error);
