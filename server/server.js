@@ -86,10 +86,11 @@ app.post('/recipe', async (req, res) => {
 
 				// store generated recipe to database, since matching recipe not found
 				var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
-				// newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
+				newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
 				// decrease rate limit by 1
-				const limitUser = await userModel.decreaseRateLimiter(user);
+				var limitUser = await userModel.decreaseRateLimiter(user);
+				limitUser = JSON.stringify(limitUser);
 
 				// return chatgpt response to user
 				res.json({ recipe: newGeneratedRecipe, user: limitUser.user });
@@ -103,6 +104,7 @@ app.post('/recipe', async (req, res) => {
    }
 
 });
+
 
 app.post('/regenerate', async (req, res) => {
 	const { prepTime, ingredients, user } = req.body;
@@ -119,8 +121,10 @@ app.post('/regenerate', async (req, res) => {
 
 			// store generated recipe to database, since matching recipe not found
 			var newGeneratedRecipe = await recipeModel.new_insert(generatedRecipe, ingredients);
+			newGeneratedRecipe = JSON.stringify(newGeneratedRecipe);
 
-			const limitUser = await userModel.decreaseRateLimiter(user);
+			var limitUser = await userModel.decreaseRateLimiter(user);
+			limitUser = JSON.stringify(limitUser);
 
 			// return chatgpt response to user
 			res.json({ recipe: newGeneratedRecipe, user: limitUser.user });
@@ -141,15 +145,17 @@ app.post('/imagetorecipe', async (req, res) => {
 
 	try {
 		if(user.rate_limiter != 0) {
-			const generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
+			var generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
+			generateRecipe = JSON.stringify(generateRecipe);
 
-			const limitUser = await userModel.decreaseRateLimiter(user);
+			var limitUser = await userModel.decreaseRateLimiter(user);
+			limitUser = JSON.stringify(limitUser);
 
 			res.json({ recipe: generateRecipe, user: limitUser.user });
 		} else {
 			res.json({ recipe: null, user: user });
 		}
-		
+
 	} catch(error) {
         console.error('Error in processing image:', error);
         res.status(500).json({ error: 'Internal Server Error' });
