@@ -75,7 +75,8 @@ app.post('/recipe', async (req, res) => {
 			const jsonMatchingRecipe = JSON.stringify(matchingRecipe);
 			res.json({recipe: jsonMatchingRecipe});
 		}else{
-			if(user.rate_limiter != 0){
+			var user_limit = user.rate_limiter;
+			if(user_limit != 0){
 				console.log("Didn't retrieve from database");
 
 				// use prompt engineering to generate the recipe using the ingredients and time
@@ -112,7 +113,8 @@ app.post('/regenerate', async (req, res) => {
 	ingredients.sort();
 
 	try {
-		if(user.rate_limiter != 0){
+		var user_limit = user.rate_limiter;
+		if(user_limit != 0){
 			// use prompt engineering to generate the recipe using the ingredients and time
 			const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients);
 
@@ -144,7 +146,8 @@ app.post('/imagetorecipe', async (req, res) => {
 	const { image_buffer, user } = req.body;
 
 	try {
-		if(user.rate_limiter != 0) {
+		var user_limit = user.rate_limiter;
+		if(user_limit != 0) {
 			var generateRecipe = await visionController.generateRecipeFromImage(image_buffer);
 			generateRecipe = JSON.stringify(generateRecipe);
 
