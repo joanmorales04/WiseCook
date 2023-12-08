@@ -4,65 +4,53 @@ import Navbar from '../navigation/Navbar';
 import Hero from '../navigation/Hero';
 import Login from './Login'; // Import Login from the parent directory
 import '../App.css'; // Import App.css from the parent directory
+import PDF from '../navigation/PDF';
 
 
 
-function Recipes({user, handleSignOut}) {
+function Recipes({user, setUser, handleSignOut}) {
 
-  const [recipes, setRecipes] = useState();
+  const [recipes, setRecipes] = useState([]);
 
-  console.log("this is user: ", user);
-  console.log("this is user recipes: ", user.user_recipes);
-
-
-//   useEffect(() => {
-//     const fetchSavedRecipes = async () => {
+  useEffect(() => {
+    const fetchSavedRecipes = async () => {
       
-//       try {
-//         const response = await fetch('http://localhost:8080/allsavedrecipes', {
-//           method: 'POST',
-//           headers: {
-//             'Content-Type': 'application/json',
-//           },
-//           body: JSON.stringify({ user: user }),
-//         });
+      try {
+        const response = await fetch('http://localhost:8080/allsavedrecipes', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ user: user }),
+        });
 
-//         if (response.ok) {
+        if (response.ok) {
 
-//           const savedRecipesResponses = await response.json();
-//           const savedRecipes = savedRecipesResponses.recipes;
+          const savedRecipesResponses = await response.json();
+          const savedRecipes = savedRecipesResponses.recipes;
+          const recipeObject = JSON.parse(savedRecipes);
 
-//           console.log("These are the saved recipes: ", savedRecipes);
-//           //setRecipes(savedRecipes);
+          setRecipes(recipeObject);
           
-        
-//         } else {
-//           throw new Error('Failed to load saved recipes');
-//         }
-//       } catch (error) {
-//         console.error('An error occurred while loading the saved recipes:', error);
-//       }
-//     };
+        } else {
+          throw new Error('Failed to load saved recipes');
+        }
+      } catch (error) {
+        console.error('An error occurred while loading the saved recipes:', error);
+      }
+    };
 
-//   fetchSavedRecipes();
-// }, []); 
-
+  fetchSavedRecipes();
+}, [user]); 
 
   return (
-    <div>
+    <div className="savedrecipes"> 
       <Navbar user={user} handleSignOut={handleSignOut}></Navbar>
 
-      <Hero 
-      cName="hero" 
-      heroImg='https://www.steriflow.com/wp-content/uploads/2020/12/propo-agro.jpg'
-      >
-      </Hero>
+      <Hero cName="hero" title = "Saved Recipes"> </Hero>
 
-      <div className="savedrecipes-container">
+      <PDF user={user} setUser={setUser} recipes={recipes}></PDF>
 
-      <p> Insert the saved recipes here in their own card element </p>
-
-      </div>
 
     </div>
   );

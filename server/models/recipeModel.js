@@ -12,6 +12,20 @@ class recipeModel {
 		return result.rows;
 	}
 
+	static async getAllRecipesTable() {
+		const query = `
+			SELECT *
+			FROM recipes
+			UNION
+			SELECT *
+			FROM recipes2;
+		`;
+		const result = await pool.query(query);
+
+		// console.log("Database:", result.rows);
+		return result.rows;
+	}
+
 	// since ranked by similarity, if pressed try again, maybe get the second ranked, such as queue system
 	static async getByIngredients(ingredients) {
 

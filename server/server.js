@@ -59,10 +59,10 @@ app.post('/login', async (req, res) => {
 app.post('/recipe', async (req, res) => {
 	try {
 		// grab ingredients and time from post request
-		const { prepTime, ingredients } = req.body;
+		const { prepTime, ingredients, mealType } = req.body;
 
 		ingredients.sort();
-		console.log(ingredients);
+		// console.log(ingredients);
 
 		// check for bad ingredients by sanitizing ingredients
 		const sanitizedIngredients = ingredients.map(ingredient => ingredient.replace(/[^a-zA-Z0-9_\s]/g, ''));
@@ -70,15 +70,20 @@ app.post('/recipe', async (req, res) => {
 		const matchingRecipe = await recipeModel.getByIngredients(sanitizedIngredients);
 
 		if(matchingRecipe != null){
-			console.log("Retrieved matching Recipe!");
+			// console.log("Retrieved matching Recipe!");
 
 			const jsonMatchingRecipe = JSON.stringify(matchingRecipe);
-			res.json({recipe: jsonMatchingRecipe});
-		}else{
-			console.log("Didn't retrieve from database");
+			// res.json({recipe: jsonMatchingRecipe});
+			res.json({
+				message: 'notnew',
+				recipe: jsonMatchingRecipe
+			});
+		}
+		else{
+			// console.log("Didn't retrieve from database");
 
 			// use prompt engineering to generate the recipe using the ingredients and time
-			const generatedPrompt = await recipeController.generatePrompt(prepTime, ingredients);
+			const generatedPrompt = await recipeController.generatePrompt(prepTime, ingredients, mealType);
 
 			// after getting the prompt, call openai api to send api request to get recipe
 			const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
@@ -92,7 +97,11 @@ app.post('/recipe', async (req, res) => {
 			// limitUser = JSON.stringify(limitUser);
 
 			// return chatgpt response to user
-			res.json({ recipe: newGeneratedRecipe });
+			// res.json({ recipe: newGeneratedRecipe });
+			res.json({ 
+				message: 'new',
+				recipe: newGeneratedRecipe 
+			});
 			
 		}
    } catch (error) {
@@ -104,13 +113,13 @@ app.post('/recipe', async (req, res) => {
 
 
 app.post('/regenerate', async (req, res) => {
-	const { prepTime, ingredients } = req.body;
+	const { prepTime, ingredients, mealType } = req.body;
 
 	ingredients.sort();
 
 	try {
 		// use prompt engineering to generate the recipe using the ingredients and time
-		const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients);
+		const generatedPrompt = await recipeController.regeneratePrompt(prepTime, ingredients, mealType);
 
 		// after getting the prompt, call openai api to send api request to get recipe. 
 		const generatedRecipe = await recipeController.generateRecipe(generatedPrompt);
@@ -208,7 +217,7 @@ app.post('/unsaverecipe', async (req, res) => {
 });
 
 
-app.get('/allsavedrecipes', async (req, res) => {
+app.post('/allsavedrecipes', async (req, res) => {
 	const { user } = req.body;
     try {
 
@@ -220,7 +229,6 @@ app.get('/allsavedrecipes', async (req, res) => {
         res.status(500).json({ error: 'Internal Server Error' });
     }
 });
-
 
 app.post('/updateratelimit', async (req, res) => {
     try {

@@ -6,19 +6,103 @@ import Navbar from '../navigation/Navbar';
 import Hero from '../navigation/Hero';
 import ingredientsData from '../ingredients.json'; 
 
+
 function Home({user, setUser, handleSignOut}) {
 
-  const [selectedTab, setSelectedTab] = useState('text'); // The default tab is 'text'
-  const [baseImage, setBaseImage] = useState("");
+  // Tab and Image handlers
+  const [selectedTab, setSelectedTab] = useState('text'); 
   const [imageAdded, setImageAdded] = useState(false);
+  const [baseImage, setBaseImage] = useState("");
+  const [baseImageDisplay, setBaseImageDisplay] = useState("");
+ 
+
+  // Ingredient JSON file
+  const [ingredientList, setIngredientList] = useState([]);
+  const [suggestedIngredients, setSuggestedIngredients] = useState([]);
+  const [suggestionSelected, setSuggestionSelected] = useState(false);
+
+ 
+  // User input
+  const [selectedPrepTime, setSelectedPrepTime] = useState('');
+  const [selectedMealType, setSelectedMealType] = useState('');
+  const [ingredients, setIngredients] = useState(['']);
+  
+
+  // Variables received from generated recipes
+  const [title, setTitle] = useState();
+  const [generatedTime, setGeneratedTime] = useState();
+  const [cookTime, setCookTime] = useState();
+  const [sevings, setServings] = useState();
+  const [generatedIngredients, setGeneratedIngredients] = useState([]);
+  const [instructions, setInstructions] = useState([]);
+  const [recipe_id, setRecipeID] = useState();
 
 
-  const uploadImage = async (e) => {
-    const file = e.target.files[0];
-    const base64 = await convertBase64(file);
-    setBaseImage(base64);    
+  // Submit buttons
+  const [submitted, setSubmitted] = useState(false);
+  const [submittedImage, setSubmittedImage] = useState(false);
+
+
+  const [loading, setLoading] = useState(false);
+
+
+  const [isRecipeSaved, setIsRecipeSaved] = useState(false);
+  const [isRecipeDeleted, setIsRecipeDeleted] = useState(false);
+
+  // If user_limiter is exceeded
+  const [showMessage, setShowMessage] = useState(false);
+
+
+
+
+
+  // Image needed to display
+  const displayImage = async (e) => {
+    const fileDisplay = e.target.files[0];
+    const base64Display = await convertBase64(fileDisplay);
+    setBaseImageDisplay(base64Display);    
   }
 
+  // Image needed for recipe
+  const uploadImage = async (e) => {
+    const file = e.target.files[0];
+  
+    // Create a FileReader to read the file
+    const fileReader = new FileReader();
+  
+    fileReader.onload = (event) => {
+      const img = new Image();
+      img.onload = () => {
+        // Create a canvas element
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+  
+        // Set the canvas size to the desired dimensions (e.g., 150x150)
+        canvas.width = 150;
+        canvas.height = 150;
+  
+        // Draw the image on the canvas, resizing it
+        ctx.drawImage(img, 0, 0, 150, 150);
+  
+        // Get the base64-encoded data URL from the canvas
+        const base64 = canvas.toDataURL('image/jpeg'); // You can use 'image/png' for PNG format
+  
+        // Update the state with the resized base64 image
+        setBaseImage(base64);
+      };
+  
+      // Set the source of the image to the FileReader result (base64)
+      img.src = event.target.result;
+    };
+  
+    // Read the file as a data URL (base64)
+    fileReader.readAsDataURL(file);
+  };
+  
+
+
+
+  // Convert image to base64 
   const convertBase64 = (file) => {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
@@ -40,6 +124,12 @@ function Home({user, setUser, handleSignOut}) {
 
   const handleAddIngredient = () => {
     setIngredients([...ingredients, '']);
+  };
+
+  const handleDeleteIngredient = (index) => {
+    const newIngredients = [...ingredients];
+    newIngredients.splice(index, 1);
+    setIngredients(newIngredients);
   };
 
   const handleInputChange = (event, index) => {
@@ -69,64 +159,68 @@ function Home({user, setUser, handleSignOut}) {
     setSuggestionSelected(false);
   };
 
+  useEffect(() => {
+    const fetchIngredients = () => {
+      try {
+        const excludedPrefixes = [
+          'fr:', 'es:', 'bg:', 'th:', 'la:', 'it:', 'pt:', 'id:', 'ro:', 'ja:',
+          'nl:', 'hu:', 'sr:', 'sv:', 'nb:', 'cs:', 'ru:', 'da:', 'el:', 'zh:',
+          'sl:', 'fi:', 'so:', 'az:', 'tr:', 'pl:', 'ar:', 'lt:', 'de:'
+        ];
 
+        const lowercasedIngredients = (ingredientsData?.tags || []).map(ingredient => ({
+          ...ingredient,
+          name: ingredient.name.toLowerCase(),
+        }));
 
-  const [ingredientList, setIngredientList] = useState([]);
-  const [suggestedIngredients, setSuggestedIngredients] = useState([]);
-  const [suggestionSelected, setSuggestionSelected] = useState(false);
+        const filteredIngredients = lowercasedIngredients.filter(ingredient => (
+          !excludedPrefixes.some(prefix => ingredient.name.startsWith(prefix)) &&
+          !/\d/.test(ingredient.name)
+        ));
 
+        setIngredientList(filteredIngredients);
+      } catch (error) {
+        console.error('Error loading ingredients from JSON file', error);
+      }
+    };
 
-// Use the data directly from the imported JSON file
-useEffect(() => {
-  const fetchIngredients = () => {
+    fetchIngredients();
+  }, []);
+
+  const handleDecrementLimiter = async () => {
     try {
-      const lowercasedIngredients = (ingredientsData?.tags || []).map(ingredient => ({
-        ...ingredient,
-        name: ingredient.name.toLowerCase(),
-      }));
-      setIngredientList(lowercasedIngredients);
-    } catch (error) {
-      console.error('Error loading ingredients from JSON file', error);
-    }
-  };
-
-  fetchIngredients();
-}, []);
- 
- 
-  const [selectedPrepTime, setSelectedPrepTime] = useState('');
-
-  const [mealType, setMealType] = useState('');
-  const [selectedMealType, setSelectedMealType] = useState('');
-
-  const [ingredients, setIngredients] = useState(['']);
-  const [submitted, setSubmitted] = useState(false);
+      const response = await fetch('http://localhost:8080/updateratelimit', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      
+        body: JSON.stringify({ user: user }),
+      });
   
-  const [title, setTitle] = useState();
-  const [generatedTime, setGeneratedTime] = useState();
-  const [cookTime, setCookTime] = useState();
-  const [sevings, setServings] = useState();
-  const [generatedIngredients, setGeneratedIngredients] = useState([]);
-  const [instructions, setInstructions] = useState([]);
-  const [recipe_id, setRecipeID] = useState();
+      if (response.ok) {
+        const receivedRecipe = await response.json();
 
-  console.log("recipe id is: ", recipe_id);
-  console.log("user is:", user);
- 
+        setUser(receivedRecipe.user);
+  
+        // console.log('Limited decremented successfully:', user.rate_limiter);
+      } else {
+        console.error('Failed to decrement the limiter:');
+      }
+    } catch (error) {
+      console.error('An error occurred while decrementing the limiter:', error);
+    }
+  }; 
 
-  const [loading, setLoading] = useState(false);
-
-  console.log(selectedPrepTime);
-  console.log(ingredients);
-  console.log(selectedMealType);
-  console.log(mealType);
-  console.log("suggestion selected is currently: " + suggestionSelected);
-
-  const [isRecipeSaved, setIsRecipeSaved] = useState(false);
-  const [isRecipeDeleted, setIsRecipeDeleted] = useState(false);
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    if (user.rate_limiter === 0) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 5000); 
+      return;
+    }
 
     setLoading(true);
   
@@ -134,7 +228,7 @@ useEffect(() => {
     const payload = {
       prepTime: selectedPrepTime,
       ingredients,
-      // mealType: selectedMealType,
+      mealType: selectedMealType,
     };
     
     try {
@@ -149,6 +243,10 @@ useEffect(() => {
       
       if (response.ok) {
         const receivedRecipe = await response.json();
+
+        if (receivedRecipe.message === 'new') {
+          await handleDecrementLimiter();
+        }
 
         const recipeObject = JSON.parse(receivedRecipe.recipe);
 
@@ -196,7 +294,8 @@ useEffect(() => {
         const savedRecipeResponse = await response.json();
         const updatedUser = savedRecipeResponse.user;
 
-        console.log("this is the update user: ", updatedUser);
+
+        // console.log("this is the update user: ", updatedUser);
 
         if(updatedUser != null)
         {
@@ -207,7 +306,7 @@ useEffect(() => {
         setIsRecipeSaved(true); 
         setIsRecipeDeleted(false);
        
-        console.log('Recipe saved successfully:', savedRecipeResponse);
+        // console.log('Recipe saved successfully:', savedRecipeResponse);
       } else {
         console.error('Failed to save the recipe:', await response.text());
       }
@@ -237,7 +336,7 @@ useEffect(() => {
           setUser(updatedUserRecipeDeleted);
         }
 
-        console.log('Recipe deleted successfully');
+        // console.log('Recipe deleted successfully');
         setIsRecipeSaved(false);
         setIsRecipeDeleted(true); 
       } else {
@@ -248,12 +347,14 @@ useEffect(() => {
     }
   };
 
-
-
-  
-  // Its working its just that openai is returning an "Unterminated string in JSON"
   const handleSubmitImage = async (event) => {
     event.preventDefault();
+
+    if (user.rate_limiter === 0) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 5000); 
+      return;
+    }
 
     setLoading(true);
   
@@ -273,22 +374,31 @@ useEffect(() => {
       });
       
       if (response.ok) {
+
         // Parse the response JSON
         const receivedImageRecipe = await response.json();
 
-        console.log("This is the new received Image Recipe: ", receivedImageRecipe);
+        // Parse the recipe
+        const newRecipe = JSON.parse(receivedImageRecipe.recipe);
 
-        // Access the content property within choices array
-        const content = receivedImageRecipe.recipe.choices[0]?.message?.content;
+        // Access and clean the content
+        const recipeContent = newRecipe.choices[0]?.message?.content;
+        const cleanedRecipeContent = recipeContent.replace(/^```json/, '').replace(/```$/, '');
 
-        console.log("This is only the content: ", content);
+        // Parse the response content JSON
+        const recipeObject = JSON.parse(cleanedRecipeContent);
 
-        // Replace template literals with regular double quotes
-        const correctedContent = content.replace(/.*```json|```/gs, '').trim();
+        setTitle(recipeObject.title);
+        setGeneratedTime(recipeObject.prep_time);
+        setCookTime(recipeObject.cook_time);
+        setServings(recipeObject.servings);
+        setGeneratedIngredients(recipeObject.ingredients);
+        setInstructions(recipeObject.instructions);
 
-        console.log("This is the corrected content: ", correctedContent);
+        await handleDecrementLimiter();
 
-        setSubmitted(true);
+        setSubmittedImage(true);
+
         setLoading(false);
 
       } else {
@@ -305,6 +415,12 @@ useEffect(() => {
 
   const generateNewRecipe = async () => {
     // Ensure this function is not called before handleSubmit has been successfully executed
+    if (user.rate_limiter === 0) {
+      setShowMessage(true);
+      setTimeout(() => setShowMessage(false), 5000); 
+      return;
+    }
+
     if (!submitted) {
       console.error('You must generate an initial recipe before requesting a new one.');
       return;
@@ -316,6 +432,7 @@ useEffect(() => {
     const payload = {
       prepTime: selectedPrepTime,
       ingredients,
+      mealType: selectedMealType,
       // excludeTitle: recipeTitle, // Uncomment if the server needs this
     };
   
@@ -331,7 +448,7 @@ useEffect(() => {
   
       if (response.ok) {
         const newRecipeResponse = await response.json();
-  
+   
         // Assuming the server's response structure is as expected
         const newRecipe = JSON.parse(newRecipeResponse.recipe);
   
@@ -342,6 +459,8 @@ useEffect(() => {
         setServings(newRecipe.servings);
         setGeneratedIngredients(newRecipe.ingredients);
         setInstructions(newRecipe.instructions);
+
+        await handleDecrementLimiter();
   
         // Set submitted to true to show the recipe
         setSubmitted(true);
@@ -358,6 +477,8 @@ useEffect(() => {
     }
   };  
 
+  // console.log("This is the recipes list: " + ingredients);
+
 
 
   return (
@@ -367,10 +488,9 @@ useEffect(() => {
 
       <Hero 
       cName="hero" 
-      heroImg='https://www.steriflow.com/wp-content/uploads/2020/12/propo-agro.jpg'
+      title="Home"
       >
       </Hero>
-
 
       <div className="tabs">
         <button
@@ -444,48 +564,54 @@ useEffect(() => {
           <p className="app-container-headers"> Enter ingredients: </p>
               
           {ingredients.map((ingredient, index) => (
-            <div key={index}>
-          
-              <input
-                type="text"
-                value={ingredient}
-                onChange={(e) => handleInputChange(e, index)}
-                onBlur={() => {
-                  if (!suggestionSelected) {
-                    // If no suggestion was selected, set the ingredient to an empty string
-                    const newIngredients = [...ingredients];
-                    newIngredients[index] = '';
-                    setIngredients(newIngredients);
-                  }
-                }}
-                
-                placeholder="Enter ingredient..."
-                style={{ display: 'block', margin: '0 auto', marginBottom: '10px' }}
-              />
-  
-              {!suggestionSelected && suggestedIngredients[index]?.length > 0 && (
-                <div className="suggestions-container">
-                  <ul className="suggestions">
-                    {suggestedIngredients[index].map((ingredient) => (
-                      <li key={ingredient.id} onClick={() => handleSelectSuggestion(ingredient, index)}>
-                        {ingredient.name}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-  
+        <div key={index} className="ingredient-input-container">
+          <div className="input-container">
+          <input
+            type="text"
+            value={ingredient}
+            onChange={(e) => handleInputChange(e, index)}
+            onBlur={() => {
+              if (!suggestionSelected) {
+                // If no suggestion was selected, set the ingredient to an empty string
+                const newIngredients = [...ingredients];
+                newIngredients[index] = '';
+                setIngredients(newIngredients);
+              }
+            }}
+            placeholder="Enter ingredient..."
+            style={{ display: 'inline-block', margin: '0 auto', marginBottom: '10px' }}
+          />
+
+          <button
+            className="delete-ingredient-button"
+            onClick={() => handleDeleteIngredient(index)}
+          >
+            X
+          </button>
+         </div>
+
+          {!suggestionSelected && suggestedIngredients[index]?.length > 0 && (
+            <div className="suggestions-container">
+              <ul className="suggestions">
+                {suggestedIngredients[index].map((ingredient) => (
+                  <li key={ingredient.id} onClick={() => handleSelectSuggestion(ingredient, index)}>
+                    {ingredient.name}
+                  </li>
+                ))}
+              </ul>
             </div>
-          ))}
-      
-          <button id="ingredient-button" type="button" onClick={handleAddIngredient}>
+          )}
+        </div>
+      ))}
+
+
+        <button id="ingredient-button" type="button" onClick={handleAddIngredient}>
             Add Ingredient
           </button>
         </div>
         </div>
         
       )}
-
 
 
       {/* image to text */}
@@ -511,36 +637,38 @@ useEffect(() => {
               onChange = {(e) => {
                 setImageAdded(true);
                 uploadImage(e);
+                displayImage(e);
               }}
             >
             </input>
 
-            <img className="imageToRecipeImage" src={baseImage}/>
+            <img className="imageToRecipeImage" src={baseImageDisplay}/>
           </div>
-          
-          
         </div>
       )}
 
        
-
-
       {selectedTab === 'text' && (
         <div className="submit-container">
-        <button id="submit-button" type="button" onClick={handleSubmit}>Submit</button>
+        <button className="submit-button" type="button" onClick={handleSubmit}>Submit</button>
       </div>
       )}
 
       {selectedTab === 'image' && (
         <div className="submit-container">
-        <button id="submit-button" type="button" onClick={handleSubmitImage}> Submit Image</button>
+        <button className="submit-button" type="button" onClick={handleSubmitImage}> Submit</button>
       </div>
       )}
 
 
 
-
       {loading && <p className="processing-message">Processing...</p>}
+
+      {showMessage && (
+        <div className="error-message">
+          Sorry, you are out of credits for today. Please come back tomorrow.
+        </div>
+      )}
 
       
       {submitted  && selectedTab === 'text' && (
@@ -553,7 +681,7 @@ useEffect(() => {
           <div className="generated-container-left">
             <p> <b> Preparation Time: </b> {generatedTime}</p>
             <p> <b> Cook Time: </b> {cookTime}</p>
-            <p> <b> Makes </b> {sevings} servings</p>
+            <p> <b> Makes </b> {sevings} <b>servings</b></p>
             <br></br>
 
             <div className="recipe-section"> 
@@ -591,12 +719,56 @@ useEffect(() => {
           )}
 
 
-
-
           <button className="generate-recipe-button" onClick={generateNewRecipe}>Generate New Recipe</button>
         </div>
       </div>
       )}
+
+
+      {submittedImage  && selectedTab === 'image' && (
+        <div className="generated-recipe-container"> 
+          <h3>Generated Recipe:</h3>
+          <br></br>
+          <b id="generated-recipe-title">{title}</b>
+        
+
+        <div className="recipe-container">
+          <div className="generated-container-left">
+            <p> <b> Preparation Time: </b> {generatedTime}</p>
+            <p> <b> Cook Time: </b> {cookTime}</p>
+            <p> <b> Makes </b> {sevings} <b>servings</b></p>
+            <br></br>
+
+            <div className="recipe-section"> 
+              <p> <b> Ingredients: </b></p>
+              <div>
+                {generatedIngredients.map((ingredient, index) => (
+                  <p key={index} style={{ marginLeft: '20px' }}>{ingredient}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="generated-container-right">
+            <div className="recipe-section"> 
+              <p id="directions-title">Directions:</p>
+              <div>
+                {instructions.map((instruction, index) => (
+                  <p key={index} style={{ marginLeft: '20px' }}>{instruction}</p>
+                ))}
+              </div>
+            </div>
+          </div>
+      
+         
+        </div>
+        <div className="button-container-a">
+
+
+        </div>
+      </div>
+      )}
+
       
     </div>
   );

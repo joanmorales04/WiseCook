@@ -9,24 +9,10 @@ const openai = new OpenAI({
   apiKey: process.env["OPENAI_API_KEY"]
 });
 
-// Function to resize and encode the image
-async function resizeAndEncodeImage(imageBuffer, width, height) {
-  // const readFileAsync = promisify(fs.readFile);
-  // const imageBuffer = await readFileAsync(imagePath);
-
-  // Resize the image to the specified dimensions (ex: 150x150)
-  const resizedImageBuffer = await sharp(imageBuffer)
-    .resize(width, height)
-    .toBuffer();
-
-  const base64Image = resizedImageBuffer.toString('base64');
-  return base64Image;
-}
-
 // Function to generate API response
-async function generateTextWithImage(prompt, imagePath, imageWidth, imageHeight) {
+async function generateTextWithImage(prompt, imagePath) {
   try {
-    const base64Image = await resizeAndEncodeImage(imagePath, imageWidth, imageHeight);
+   
 
     const headers = {
       "Content-Type": "application/json",
@@ -46,13 +32,13 @@ async function generateTextWithImage(prompt, imagePath, imageWidth, imageHeight)
             {
               "type": "image_url",
               "image_url": {
-                "url": `data:image/jpeg;base64,${base64Image}`,
+                "url": imagePath,
               },
             },
           ],
         },
       ],
-      "max_tokens": 300,
+      "max_tokens": 400,
     };
 
     const response = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -62,7 +48,7 @@ async function generateTextWithImage(prompt, imagePath, imageWidth, imageHeight)
     });
 
     const responseData = await response.json();
-    return responseData;
+        return responseData;
   } catch (error) {
     throw error;
   }
@@ -72,13 +58,15 @@ async function generateTextWithImage(prompt, imagePath, imageWidth, imageHeight)
 const visionController = {
 
   // Function to generate a recipe based on the prompt and resized image
-  generateRecipeFromImage: async (imagePath, imageWidth=150, imageHeight=150) => {
+  generateRecipeFromImage: async (imagePath) => {
     try {
-      const prompt = `Is this image food? If yes, generate me a recipe so that I could make it. The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary.
-      Limit the response to no more than 500 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array.`;
+      const prompt = `Generate a cooking recipe using this image.
+      The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary.
+      Only reply with the generated recipe.
+      Limit the response to no more than 300 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array. `;
 
       // Generate the recipe text using the provided prompt and resized image
-      const generatedRecipe = await generateTextWithImage(prompt, imagePath, imageWidth, imageHeight);
+      const generatedRecipe = await generateTextWithImage(prompt, imagePath);
 
       // Return the generated recipe
       return generatedRecipe;

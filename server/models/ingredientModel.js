@@ -6,7 +6,7 @@ class ingredientModel {
 		const query = 'SELECT * FROM ingredients';
 		const result = await pool.query(query);
 
-		console.log("Database:", result.rows);
+		// console.log("Database:", result.rows);
 		return result.rows;
 	}
 
@@ -29,7 +29,7 @@ class ingredientModel {
 
 			const isValid = await ingredientModel.validIngreient(lowerCaseIngredient);
 			if(isValid == false){
-				console.log(`User ingredient "${lowerCaseIngredient}" is not in the database.`);
+				// console.log(`User ingredient "${lowerCaseIngredient}" is not in the database.`);
 				return false;
 			}
 		}

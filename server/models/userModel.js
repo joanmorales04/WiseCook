@@ -46,7 +46,7 @@ class userModel {
 			];
 
 			const result = await pool.query(query, values);
-			console.log("Inserted user into the database:", result.rows[0]);
+			// console.log("Inserted user into the database:", result.rows[0]);
 			return result.rows[0];
 
 		} catch (error) {
@@ -81,10 +81,10 @@ class userModel {
 
 	            const result = await pool.query(query, values);
 
-	            console.log("Saved recipe into the database:", result.rows[0]);
+	            // console.log("Saved recipe into the database:", result.rows[0]);
 	            return { success: true, message: "Recipe successfully saved.", user: result.rows[0] };
 	        } else {
-	            console.log("Recipe ID already exists in the user_recipes array. Not adding duplicate.");
+	            // console.log("Recipe ID already exists in the user_recipes array. Not adding duplicate.");
 	            return { success: false, message: "Recipe ID is already saved.", user: null };
 	        }
 	    } catch (error) {
@@ -106,11 +106,11 @@ class userModel {
 	        const result = await pool.query(query, values);
 
 			if (result.rows.length === 0) {
-				console.log("Recipe ID not found in the user_recipes array. Nothing to unsave.");
+				// console.log("Recipe ID not found in the user_recipes array. Nothing to unsave.");
 	            return {success: false, message: "Recipe ID not found in the user's recipe. Nothing to unsave."};
 			}
 
-	        console.log("Unsaved recipe from the database:", result.rows[0]);
+	        // console.log("Unsaved recipe from the database:", result.rows[0]);
 	        return { success: true, message: "Recipe successfully unsaved.", user: result.rows[0] };
 	    } catch (error) {
 	        console.error("Error unsaving recipe from the database:", error);
@@ -173,10 +173,10 @@ class userModel {
 	        const result = await pool.query(query, values);
 
 	        if (result.rows.length > 0) {
-	            console.log("Decreased rate limiter for user:", result.rows[0]);
+	            // console.log("Decreased rate limiter for user:", result.rows[0]);
 	            return { success: true, message: "Rate limiter decreased successfully.", user: result.rows[0] };
 	        } else {
-	            console.log("User not found. Rate limiter not decreased.");
+	            // console.log("User not found. Rate limiter not decreased.");
 	            return { success: false, message: "User not found. Rate limiter not decreased.", user: null };
 	        }
 	    } catch (error) {

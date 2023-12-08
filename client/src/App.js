@@ -10,7 +10,6 @@ import './App.css';
 function App() {
  
   const [user, setUser] = useState({});
-  console.log("user in App.js:", user);
 
   const handleSignOut = () => {
     setUser({});
@@ -22,7 +21,7 @@ return (
       <Routes>
         <Route path="/login" element={<Login setUser={setUser} />} />
         <Route path="/home" element={<Home user={user} setUser={setUser} handleSignOut={handleSignOut} />} />
-        <Route path="/recipes" element={<Recipes user={user} handleSignOut={handleSignOut} />} />
+        <Route path="/recipes" element={<Recipes user={user} setUser={setUser} handleSignOut={handleSignOut} />} />
         <Route path="/*" element={<Navigate to="/login" />} />
       </Routes>
     </div>

@@ -32,11 +32,12 @@ const recipeController = {
   },
 
   // Function to create a prompt and return based on the user input
-  generatePrompt: async (prepTime, userIngredients) => {
+  generatePrompt: async (prepTime, userIngredients, mealType) => {
     try {
-      const prompt = `Generate a cooking recipe that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
+      const prompt = `Generate a cooking recipe for ${mealType} that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
       The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary.
-      Limit the response to no more than 500 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array. `;
+      Limit the response to no more than 500 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array. 
+      The instructions should be numbered in order `;
 
       return prompt;
     } catch (error) { 
@@ -45,9 +46,9 @@ const recipeController = {
   },
 
   // Function to create a prompt and return based on the user input
-  regeneratePrompt: async (prepTime, userIngredients) => {
+  regeneratePrompt: async (prepTime, userIngredients, mealType) => {
     try {
-      const prompt = `Generate another cooking recipe that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
+      const prompt = `Generate another cooking recipe for ${mealType} that can be prepared in ${prepTime} minutes using the following ingredient list: ${userIngredients.join(', ')}. 
       The recipe should include the necessary ingredients, and the instructions should contain easy-to-understand vocabulary.
       Limit the response to no more than 500 words and in JSON format with the properties and their respective values: title, prep_time, cook_time, servings, ingredients, instructions. Ingredients and Instructions should hold the values in an array. `;
 

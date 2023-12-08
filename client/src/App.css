@@ -94,7 +94,6 @@
 
 
 /* Navbar Styling  */
-
 .navbar {
   background-color: #e2c9c6;
 }
@@ -108,6 +107,10 @@
 
 .me-auto :hover{
   text-shadow: 1px 1px 5px white;
+}
+
+.navbar-text{
+  margin-left: 20px;
 }
 
 
@@ -130,13 +133,18 @@
 
 .hero-text {
   position: absolute;
-  top: 12%;
+  top: 50%;
   left: 50%;
+  width: 100%;
+  height: 50%;
   transform: translate(-50%, -50%);
+  background-color: rgba(0,0,0,.15);
+  color: #fff;
 }
 
-.hero-text h2 {
-  font-size: 2rem;
+#hero-title{
+  font-size: 60px;
+  font-family: 'Dancing Script', cursive;
   background-color: white;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -159,6 +167,8 @@
     padding: 0 0 2rem 0;
   }
 }
+
+
 
 
 
@@ -275,7 +285,25 @@ input {
   background-color: #D2691E; 
 }
 
+.delete-ingredient-button {
+  cursor: pointer;
+  margin-left: 10px;
+  border: 1px solid #A0522D; 
+  background-color: white;
+  color: #A0522D; 
+  transition: opacity 0.3s ease;
+  opacity: 0;
+}
 
+.input-container:hover .delete-ingredient-button {
+  opacity: 1;
+  transition: opacity 0.3s ease;
+} 
+
+.delete-ingredient-button:hover{
+  background-color: #A0522D; 
+  color: white;
+}
 
 
 /* Submit */
@@ -289,7 +317,7 @@ input {
   padding: 20px;
 }
 
-#submit-button{
+.submit-button{
   background-color: #8B4513;
   height: 30px;
   width: 90px;
@@ -299,7 +327,7 @@ input {
   transition: background-color 0.3s ease; 
 }
 
-#submit-button:hover {
+.submit-button:hover {
     background-color: #D2691E; 
 } 
 
@@ -314,6 +342,24 @@ input {
   text-align: center;
 }
 
+/* Error message */
+.error-message {
+  font-size: 20px;
+  font-weight: bold;
+  color: #D2691E;
+  margin-top: 20px;
+  text-align: center;
+}
+
+/* Exceeded rate limiter message */
+.rate-limiter-message {
+  font-size: 25px;
+  font-weight: bold;
+  color: #D2691E;
+  margin-top: 20px;
+  text-align: center;
+}
+
 
 /* Generated Recipe Container */
 .generated-recipe-container {
@@ -321,7 +367,7 @@ input {
   width: 90%;
   margin: auto;
   margin-top: 30px;
-  padding-top: 20px;
+  padding-top: 30px;
   text-align: center;
   background-color: #FFFAF0; 
   border: 1px solid #E6E6FA;
@@ -463,19 +509,7 @@ input {
 }
 
 
-.app-savedrecipes-container {
-  display: flex;
-  height: 100%;
-  width: 90%;
-  margin: auto;
-  text-align: center;
-  background-color: #FFFAF0; 
-  border: 1px solid #E6E6FA;
-  margin-top: 40px;
-  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
-  padding: 20px;
-  justify-content: center;
-}
+
 
 
 .image-input {
@@ -487,20 +521,95 @@ input {
 }
 
 .imageToRecipeImage{
-  width: 35%;
+  width: 40%;
   margin-left: 20px;
 }
 
 .savedrecipes-container {
-  display: flex;
+  display: flexbox;
+  width: 90%; 
   height: 100%;
-  width: 90%;
-  margin: auto;
-  justify-content: center;
-  text-align: center;
+  margin: 0 auto;
+  padding: 20px;
+  position: relative;
   background-color: #FFFAF0; 
   border: 1px solid #E6E6FA;
   box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+  margin-top: 40px;
+}
+
+.recipe-card{
+  width: 40%;
+  height: auto;
+  margin: 0 auto;
+  padding: 10px;
+  position: relative;
+  background-color: #e2c9c6;
+  text-align: center;
+  margin-top: 30px;
+  border-radius: 90px;
+}
+
+.recipe-card.expanded{
+  background-color: #e2c9c6;
+  padding: 30px;
+  width: 100%;
+}
+
+.unsave-saved-recipe-button {
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.unsave-saved-recipe-button:hover{
+  background-color: #D2691E;
+}
+
+.download-button {
+  background-color: #8B4513;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.download-button:hover{
+  background-color: #D2691E;
+}
+
+/* Generated Recipe Container */
+.saved-generated-recipe-container {
+  height: 100%;
+  width: 90%;
+  margin: auto;
+  margin-top: 30px;
+  padding-top: 30px;
+  text-align: center;
+  background-color: white; 
+  border: 1px solid #E6E6FA;
+  box-shadow: 0px 0px 15px rgba(0, 0, 0, 0.1); 
+}
+
+.saved-recipe-container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  margin: auto;
+  text-align: center;
+  background-color: white; 
   padding: 20px;
   margin-top: 40px;
+}
+
+#wiseCookText {
+  font-family: 'Dancing Script', cursive;
 }

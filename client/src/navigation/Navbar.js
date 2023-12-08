@@ -28,11 +28,12 @@ import "bootstrap/dist/css/bootstrap.min.css";
               Recipes
             </Nav.Link>
             <Nav.Link onClick={handleSignOutAndNavigate}>Sign Out</Nav.Link>
+          </Nav>
+          <Nav className="navbar-text">
+            <Navbar.Text >Signed in as: {user.user_name} </Navbar.Text>  
+            <Navbar.Text> Credits: {user.rate_limiter}</Navbar.Text>          
+          </Nav>
 
-          </Nav>
-          <Nav>
-            <Navbar.Text>Signed in as: {user.user_name}</Navbar.Text> 
-          </Nav>
         </Container>
       </Navbar>
     );
